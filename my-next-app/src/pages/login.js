@@ -12,20 +12,24 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userData = await login({ email, password }); // Assuming login returns user data including role
+        const userData = await login({ email, password });
+        console.log('User Data:', userData); // Log the returned user data
 
-      // Check if user role is 'customer'
-      if (userData && userData.role === 'customer') {
-        router.push('/'); // Redirect to home if the user is a customer
-      } else {
-        setError('You do not have permission to access this application.'); // Set error message for non-customers
-      }
+        // Check if user role is 'customer'
+        if (userData && userData.role === 'customer') {
+            console.log('User has customer access');
+            router.push('/'); // Redirect to home if the user is a customer
+        } else {
+            console.log('User does not have customer access');
+            setError('You do not have permission to access this application.');
+        }
     } catch (err) {
-      console.error('Login failed:', err);
-      setError('Login failed. Please check your credentials and try again.'); // Set error message for login failure
+        console.error('Login failed:', err);
+        setError('Login failed. Please check your credentials and try again.');
     }
-  };
+};
 
+  
   return (
     <div className="flex items-center justify-center h-screen">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
