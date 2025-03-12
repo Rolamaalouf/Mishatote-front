@@ -1,29 +1,26 @@
 // context/AuthContext.js
-"use client"; // Mark this file as a Client Component
+'use client';  // Add this line to mark the file as a client component
 
-import React, { createContext, useContext, useState } from 'react';
-import axios from 'axios';
+import { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Store user data including role
-
-  const login = async (credentials) => {
-    try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/login`, credentials);
-        const userData = response.data.user; // Accessing user data directly
-        setUser(userData); // Store user data in context
-        return userData; // Return user data for further processing
-    } catch (error) {
-        console.error('Login failed:', error);
-        throw error; // Rethrow error for handling in LoginPage
-    }
+export const useAuth = () => {
+  return useContext(AuthContext);
 };
 
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+
+  const login = async ({ email, password }) => {
+    // Simulate an API call or logic for user login
+    const userData = { name: 'John Doe', email };  // Example user data
+    setUser(userData);
+    return userData;
+  };
 
   const logout = () => {
-    setUser(null); // Clear user data from context
+    setUser(null);
   };
 
   return (
@@ -31,8 +28,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  return useContext(AuthContext);
 };

@@ -1,40 +1,35 @@
+// pages/login.js (or wherever the login page is)
+'use client';
+
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext'; // Adjust path as necessary
-import { useRouter } from 'next/router';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuth();
   const router = useRouter();
-  const [error, setError] = useState(''); // State for error messages
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const userData = await login({ email, password });
-        console.log('User Data:', userData); // Log the returned user data
+      const userData = await login({ email, password });
 
-        // Check if user role is 'customer'
-        if (userData && userData.role === 'customer') {
-            console.log('User has customer access');
-            router.push('/'); // Redirect to home if the user is a customer
-        } else {
-            console.log('User does not have customer access');
-            setError('You do not have permission to access this application.');
-        }
+      if (userData) {
+        router.push('/');  // Redirect to home page
+      }
     } catch (err) {
-        console.error('Login failed:', err);
-        setError('Login failed. Please check your credentials and try again.');
+      setError('Login failed. Please check your credentials and try again.');
     }
-};
+  };
 
-  
   return (
     <div className="flex items-center justify-center h-screen">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
         <h2 className="text-2xl mb-4">Login</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>} {/* Display error message */}
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="mb-4">
           <label className="block mb-1" htmlFor="email">Email:</label>
           <input

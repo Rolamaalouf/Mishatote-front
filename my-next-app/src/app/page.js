@@ -1,8 +1,13 @@
-// pages/index.js (your existing Home component)
+'use client';
+
+// pages/index.js (Home Component)
 import Head from "next/head";
-import Header from "@/Components/header"; // Ensure correct path
+import Header from "@/Components/header";
+import { useAuth } from '@/context/AuthContext';  // Import the AuthContext
 
 export default function Home() {
+  const { user } = useAuth();  // Get the user from context
+
   return (
     <div className="relative w-full h-screen">
       <Head>
@@ -13,14 +18,14 @@ export default function Home() {
       <Header />
 
       {/* Cover Image as Background */}
-      <div className="absolute inset-0 -z-10 aspect-[4/3]"> {/* Maintain 4:3 Aspect Ratio */}
+      <div className="absolute inset-0 -z-10 aspect-[4/3]">
         <div
           className="w-full h-full bg-cover bg-center"
           style={{
             backgroundImage: "url('https://i.ibb.co/PGvyV6vv/Group-1-2.png')",
-            backgroundSize: "cover", // Ensures the image covers the entire area
-            backgroundPosition: "center", // Centers the image
-            backgroundRepeat: "no-repeat", // Prevents tiling
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           }}
         ></div>
       </div>
@@ -34,6 +39,13 @@ export default function Home() {
           Collections
         </button>
       </div>
+
+      {/* Display Welcome Message if User is Logged In */}
+      {user && (
+        <div className="absolute bottom-10 left-20 text-xl font-semibold text-black">
+          <p>Welcome back, {user.name}!</p>
+        </div>
+      )}
     </div>
   );
 }
