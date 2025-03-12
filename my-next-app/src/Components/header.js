@@ -22,26 +22,37 @@ const Header = () => {
         <Link href="/contact">Contact</Link>
       </nav>
 
-      {/* Icons */}
+      {/* Icons as Buttons */}
       <div className="flex space-x-4">
-        <ImageComponent 
-          src="https://i.ibb.co/z04cdbb/image-13-1.png" 
-          alt="User" 
-          width={25} 
-          height={25} 
-        />
-        <ImageComponent 
-          src="https://i.ibb.co/spm9LYcK/Vector.png" 
-          alt="Wishlist" 
-          width={25} 
-          height={25} 
-        />
-        <ImageComponent 
-          src="https://i.ibb.co/3mt2BFXt/Cart.png" 
-          alt="Cart" 
-          width={25} 
-          height={25} 
-        />
+        {/* User Button - Links to Login Page */}
+        <Link href="/login">
+          <ImageComponent 
+            src="https://i.ibb.co/z04cdbb/image-13-1.png" 
+            alt="User" 
+            width={25} 
+            height={25} 
+          />
+        </Link>
+
+        {/* Wishlist Button */}
+        <Link href="/wishlist">
+          <ImageComponent 
+            src="https://i.ibb.co/spm9LYcK/Vector.png" 
+            alt="Wishlist" 
+            width={25} 
+            height={25} 
+          />
+        </Link>
+
+        {/* Cart Button */}
+        <Link href="/cart">
+          <ImageComponent 
+            src="https://i.ibb.co/3mt2BFXt/Cart.png" 
+            alt="Cart" 
+            width={25} 
+            height={25} 
+          />
+        </Link>
       </div>
     </header>
   );

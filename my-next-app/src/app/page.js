@@ -1,3 +1,4 @@
+// pages/index.js (your existing Home component)
 import Head from "next/head";
 import Header from "@/Components/header"; // Ensure correct path
 
