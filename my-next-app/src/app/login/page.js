@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import Link from "next/link";
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -56,7 +57,13 @@ const LoginPage = () => {
           Login
         </button>
       </form>
-      
+      <p className="text-sm text-gray-600">
+        Don't have an account?{" "}
+        <Link href="/register" className="text-blue-500 hover:underline font-medium">
+          Register here
+        </Link>
+      </p>
+
     </div>
   );
 };
