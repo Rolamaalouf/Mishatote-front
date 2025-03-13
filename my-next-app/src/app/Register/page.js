@@ -1,32 +1,35 @@
-'use client';
+"use client";  // ✅ Add this at the top
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const RegisterPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/register`, {
-        name,
-        address,
-        email,
-        password,
-      });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/register`,
+        {
+          name,
+          address,
+          email,
+          password,
+        }
+      );
 
       if (response.status === 201) {
-        router.push('/login');
+        router.push("/login");  // Redirect to login page after successful registration
       }
     } catch (err) {
-      setError('Unable to sign up');
+      setError("Unable to sign up");
     }
   };
 
@@ -36,7 +39,9 @@ const RegisterPage = () => {
         <h2 className="text-2xl mb-4">Register</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="mb-4">
-          <label className="block mb-1" htmlFor="name">Name</label>
+          <label className="block mb-1" htmlFor="name">
+            Name
+          </label>
           <input
             type="text"
             id="name"
@@ -47,7 +52,9 @@ const RegisterPage = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-1" htmlFor="email">Email:</label>
+          <label className="block mb-1" htmlFor="email">
+            Email:
+          </label>
           <input
             type="email"
             id="email"
@@ -58,7 +65,9 @@ const RegisterPage = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-1" htmlFor="password">Password:</label>
+          <label className="block mb-1" htmlFor="password">
+            Password:
+          </label>
           <input
             type="password"
             id="password"
@@ -69,7 +78,9 @@ const RegisterPage = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-1" htmlFor="address">Address</label>
+          <label className="block mb-1" htmlFor="address">
+            Address
+          </label>
           <input
             type="text"
             id="address"
