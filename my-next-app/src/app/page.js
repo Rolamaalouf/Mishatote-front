@@ -5,6 +5,7 @@ import Head from "next/head";
 import Header from "@/Components/header";
 import { useAuth } from '@/context/AuthContext';  // Import the AuthContext
 
+
 export default function Home() {
   const { user } = useAuth();  // Get the user from context
 
