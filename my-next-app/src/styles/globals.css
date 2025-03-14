@@ -3,3 +3,6 @@
 body {
   font-family: "Belleza", sans-serif;
 }
+.header-class {
+  z-index: 100; /* Adjust as needed */
+}

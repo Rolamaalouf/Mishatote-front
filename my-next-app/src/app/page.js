@@ -9,17 +9,14 @@ export default function Home() {
   const { user } = useAuth();  // Get the user from context
 
   return (
-    <div className="relative w-full" style={{ maxWidth: "1600px", margin: "0 auto" }}>
-      <Head>
-        <title>Tote Shop</title>
-      </Head>
+    <div className="relative w-full min-h-screen" style={{ maxWidth: "1600px", margin: "0 auto", overflow: "visible" }}>
+      <div className="relative z-50">
+        <Header />
+      </div>
 
-      {/* Header */}
-      <Header />
-
-      {/* Hero Section with Background - Using the original structure */}
-      <div className="relative w-full h-screen mb-150"> {/* Added margin bottom to create more space */}
-        {/* Cover Image as Background - Using original aspect ratio approach */}
+      {/* Hero Section with Background */}
+      <div className="relative w-full h-screen mb-150">
+        {/* Cover Image as Background */}
         <div className="absolute inset-0 -z-10 aspect-[4/3]">
           <div
             className="w-full h-full bg-cover bg-center"
@@ -43,8 +40,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* New Section Below Background - Now with more separation from the hero section */}
-      <div className="w-full flex flex-col items-center text-center mt-32"> {/* Increased top margin */}
+      {/* New Section Below Background */}
+      <div className="relative z-20 w-full flex flex-col items-center text-center mt-32">
         <p className="text-[70px] font-semibold text-black leading-tight max-w-8xl">
           Elevate your style and sustainability with our chic tote bags—perfect for any occasion and designed to carry your essentials with flair!
         </p>
@@ -58,19 +55,18 @@ export default function Home() {
             <span className="text-[55px] font-semibold text-white ml-6">or Not</span>
           </div>
         </div>
+
         {/* Two Rectangles - Left (Customer Favorites) & Right (Everyday or Not) */}
-     <div className="relative mt-6 w-full flex justify-between items-center">
-  <div className="relative h-[146px] bg-[#4A8C8C] flex items-center justify-end pr-6" style={{ width: "calc(100% - 700px)" }}>
-    <span className="text-[55px] font-semibold text-white">Customer</span>
-  </div>
+        <div className="relative mt-6 w-full flex justify-between items-center">
+          <div className="relative h-[146px] bg-[#4A8C8C] flex items-center justify-end pr-6" style={{ width: "calc(100% - 700px)" }}>
+            <span className="text-[55px] font-semibold text-white">Customer</span>
+          </div>
 
-  {/* Right Rectangle - Everyday or Not */}
-  <div className="flex items-center">
-    <span className="text-[55px] font-semibold text-black mr-120">Favorites</span>
-</div>
-
-</div>
-
+          {/* Right Rectangle - Everyday or Not */}
+          <div className="flex items-center">
+            <span className="text-[55px] font-semibold text-black mr-120">Favorites</span>
+          </div>
+        </div>
       </div>
 
       {/* Display Welcome Message if User is Logged In */}
