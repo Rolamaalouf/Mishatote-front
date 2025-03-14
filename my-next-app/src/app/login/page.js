@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ToastContainer, toast } from 'react-toastify';
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -18,15 +19,30 @@ const LoginPage = () => {
       const userData = await login({ email, password });
 
       if (userData) {
+        toast.success('Login successful');
         router.push("/"); // Redirect to home page
       }
     } catch (err) {
+      toast.error('Invalid email or password');
       setError("Login failed. Please check your credentials and try again.");
     }
   };
 
   return (
     <div className="flex h-screen">
+         <ToastContainer
+        position="top-left"
+        autoClose={4001}
+        limit={4}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       {/* Left Side - Image Section */}
       <div className="w-1/2 flex items-center justify-center bg-[#4A8C8C]">
         <img

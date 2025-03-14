@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -22,15 +23,30 @@ const RegisterPage = () => {
       );
 
       if (response.status === 201) {
+        toast.success('Login successful');
         router.push("/login"); // Redirect to login page after successful registration
       }
     } catch (err) {
+      toast.error('Invalid email or password');
       setError("Unable to sign up");
     }
   };
 
   return (
     <div className="flex h-screen">
+       <ToastContainer
+        position="top-left"
+        autoClose={4001}
+        limit={4}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       {/* Left Side - Register Form */}
       <div className="w-1/2 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-lg w-96">
