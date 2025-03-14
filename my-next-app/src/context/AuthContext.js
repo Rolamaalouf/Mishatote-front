@@ -1,6 +1,5 @@
 // context/AuthContext.js
-'use client';  // Add this line to mark the file as a client component
-
+'use client';
 import { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext();
@@ -13,10 +12,25 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const login = async ({ email, password }) => {
-    // Simulate an API call or logic for user login
-    const userData = { name: 'John Doe', email };  // Example user data
-    setUser(userData);
-    return userData;
+    try {
+      // Add your API URL here 👇
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      const userData = await response.json();
+      setUser(userData.user); // Update state with API response
+      return userData.user;
+
+    } catch (err) {
+      throw new Error('Login failed. Check credentials.');
+    }
   };
 
   const logout = () => {
