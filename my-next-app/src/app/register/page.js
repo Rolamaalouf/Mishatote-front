@@ -17,12 +17,8 @@ const RegisterPage = () => {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/users/register`,
-        {
-          name,
-          address,
-          email,
-          password,
-        }
+        { name, address, email, password },
+        { withCredentials: true }  // Ensures cookies are sent with the request
       );
 
       if (response.status === 201) {
