@@ -2,29 +2,32 @@
 
 // pages/index.js (Home Component)
 import Head from "next/head";
-import Header from "@/Components/header";
+import Header from "@/app/Components/header";
 import { useAuth } from '@/context/AuthContext';  // Import the AuthContext
+import Footer from "@/app/Components/footer";
 
 export default function Home() {
   const { user } = useAuth();  // Get the user from context
 
   return (
-<div className="relative w-full min-h-screen">
+<div className="relative w-full min-h-screen ">
   <div className="relative z-50">
     <Header />
   </div>
 
   {/* Hero Section with Background */}
-  <div className="relative w-full h-screen mb-120">
+  <div className="relative w-full h-screen mb-100">
     {/* Background Image as Cover */}
     <div className="absolute inset-0 -z-10">
   <div
-    className="w-full h-screen min-h-screen bg-cover bg-center bg-no-repeat"
+    className="w-full h-screen min-h-screen bg-cover bg-center bg-no-repeat mb-20"
     style={{
-      backgroundImage: "url('https://i.ibb.co/gMq6XGrT/Group-2-1.png')",
-      height: "150vh", // Ensures full viewport height
+      backgroundImage: "url('https://i.ibb.co/ds9Yxb11/Group-5.png')",
+      height: "140vh", // Ensures full viewport height
       minHeight: "700px", // Fallback for smaller screens
       backgroundSize: "cover",
+      top: "-50px",
+      position: "absolute",
       backgroundPosition: "center",
     }}
   ></div>
@@ -32,12 +35,12 @@ export default function Home() {
 
 
     {/* Hero Content - Placed on Top of Image */}
-    <div className="absolute top-4/4 left-20 transform -translate-y-1/2 flex flex-col items-center space-y-6">
-  <h1 className="font-belleza text-[10vw] md:text-[110px] leading-tight text-black">
-    Carry your <br /> DREAMS <br/>  
+    <div className="absolute left-20 transform -translate-y-1/2 flex flex-col items-center space-y-6 mt-120">
+  <h1 className="font-belleza text-[10vw] md:text-[100px] leading-tight text-black mt-80">
+    Carry your DREAMS <br/>  
     <span className="whitespace-nowrap">in a tote</span>
   </h1>
-  <button className="mr-50 px-10 py-4 text-3xl font-semibold bg-[#4A8C8C] text-white rounded">
+  <button className="absolute ml-50 mt-120 px-10 py-4 text-3xl font-semibold bg-[#4A8C8C] text-white rounded">
     Collections
   </button>
 </div>
@@ -77,10 +80,12 @@ export default function Home() {
 
       {/* Display Welcome Message if User is Logged In */}
       {user && (
-        <div className="text-center mt-12 mb-6 text-xl font-semibold text-black">
-          <p>Welcome back, {user.name}!</p>
-        </div>
+    <div className="absolute top-30 right-0 transform -translate-x-1/2 text-center text-xl font-semibold text-black z-50">
+    <p>Welcome back, {user.name}!</p>
+  </div>
       )}
+            {/* Footer */}
+            <Footer />
     </div>
   );
 }
