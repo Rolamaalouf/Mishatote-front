@@ -10,40 +10,46 @@ export default function Home() {
   const { user } = useAuth();  // Get the user from context
 
   return (
-    <div className="relative w-full min-h-screen" style={{ maxWidth: "1600px", margin: "0 auto", overflow: "visible" }}>
-      <div className="relative z-50">
-        <Header />
-      </div>
+<div className="relative w-full min-h-screen">
+  <div className="relative z-50">
+    <Header />
+  </div>
 
-      {/* Hero Section with Background */}
-      <div className="relative w-full h-screen mb-150">
-        {/* Cover Image as Background */}
-        <div className="absolute inset-0 -z-10 aspect-[4/3]">
-          <div
-            className="w-full h-full bg-cover bg-center"
-            style={{
-              backgroundImage: "url('https://i.ibb.co/PGvyV6vv/Group-1-2.png')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
-          ></div>
-        </div>
+  {/* Hero Section with Background */}
+  <div className="relative w-full h-screen mb-120">
+    {/* Background Image as Cover */}
+    <div className="absolute inset-0 -z-10">
+  <div
+    className="w-full h-screen min-h-screen bg-cover bg-center bg-no-repeat"
+    style={{
+      backgroundImage: "url('https://i.ibb.co/gMq6XGrT/Group-2-1.png')",
+      height: "150vh", // Ensures full viewport height
+      minHeight: "700px", // Fallback for smaller screens
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+  ></div>
+</div>
 
-        {/* Hero Content */}
-        <div className="absolute top-1/3 left-20 max-w-lg">
-          <h1 className="font-belleza text-[110px] leading-tight text-black">
-            Carry your <br /> dreams in a <br /> tote
-          </h1>
-          <button className="mt-6 px-8 py-3 text-lg font-semibold bg-[#4A8C8C] text-white rounded">
-            Collections
-          </button>
-        </div>
-      </div>
+
+    {/* Hero Content - Placed on Top of Image */}
+    <div className="absolute top-4/4 left-20 transform -translate-y-1/2 flex flex-col items-center space-y-6">
+  <h1 className="font-belleza text-[10vw] md:text-[110px] leading-tight text-black">
+    Carry your <br /> DREAMS <br/>  
+    <span className="whitespace-nowrap">in a tote</span>
+  </h1>
+  <button className="mr-50 px-10 py-4 text-3xl font-semibold bg-[#4A8C8C] text-white rounded">
+    Collections
+  </button>
+</div>
+
+  </div>
+
+
 
       {/* New Section Below Background */}
-      <div className="relative z-20 w-full flex flex-col items-center text-center mt-32">
-        <p className="text-[70px] font-semibold text-black leading-tight max-w-8xl">
+      <div className="relative z-20 w-full flex flex-col items-center text-center">
+        <p className="text-[70px] text-black leading-tight max-w-8xl mb-20">
           Elevate your style and sustainability with our chic tote bags—perfect for any occasion and designed to carry your essentials with flair!
         </p>
 
