@@ -20,7 +20,13 @@ const LoginPage = () => {
 
       if (userData) {
         toast.success('Login successful');
-        router.push("/"); // Redirect to home page
+
+        // Check if the user has the "admin" role
+        if (userData.role === "admin") {
+          router.push("/dashboardProduct"); // Redirect admins to dashboardProduct
+        } else {
+          router.push("/"); // Redirect non-admins to home page
+        }
       }
     } catch (err) {
       toast.error('Invalid email or password');
@@ -30,7 +36,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex h-screen">
-         <ToastContainer
+      <ToastContainer
         position="top-left"
         autoClose={4001}
         limit={4}
