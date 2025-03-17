@@ -35,7 +35,7 @@ const RegisterPage = () => {
   return (
     <div className="flex h-screen">
        <ToastContainer
-        position="top-left"
+        position="bottom-right"
         autoClose={4001}
         limit={4}
         hideProgressBar={false}

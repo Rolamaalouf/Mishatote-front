@@ -8,12 +8,12 @@ const AboutUs = () => {
       {/* Header Component */}
       <Header />
 
-      <div className="bg-[#A68F7B] h-[50vh] flex items-center justify-center mt-20">
-        <h1 className="text-white text-5xl sm:text-6xl font-bold text-center">About Us</h1>
+      <div className="bg-[#A68F7B] h-[50vh] flex items-start justify-center mt-20">
+        <h1 className="text-white text-5xl sm:text-6xl font-bold text-center lg:mt-25">About Us</h1>
       </div>
 
       {/* Image */}
-      <div className="relative flex justify-center mt-6 sm:-mt-20">
+      <div className="relative flex justify-center mt-6 sm:-mt-20 lg:-top-35">
         <img 
           src="/About.png" 
           alt="Beirut Crisis" 
@@ -23,7 +23,7 @@ const AboutUs = () => {
 
 
       {/* Description */}
-      <div className="w-4/5 mx-auto mt-10 sm:mt-0">
+      <div className="w-4/5 mx-auto sm:mt-0">
         <p className="text-center text-[#A68F7B] text-lg sm:text-xl md:text-2xl lg:text-3xl">
           Lebanon is suffering a financial and economic meltdown which the World Bank has labeled as one of the deepest 
           depressions of modern history. Compounded by the Covid-19 pandemic and a massive explosion at Beirut’s port that 
@@ -36,10 +36,10 @@ const AboutUs = () => {
 
    {/* Mission & Vision Section */}
 {/* Mission & Vision Section */}
-<div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-[58px]  mt-20 px-4 md:px-10">
+<div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-[78px]  mt-20 px-4 md:px-10">
 
   {/* Left Side - Image & Background (1fr) */}
-  <div className="relative col-span-1 bg-[#4A8C8C] flex items-center justify-start px-6 h-[400px] md:h-[600px] lg:h-[750px]">
+  <div className="relative col-span-1 bg-[#4A8C8C] flex items-center justify-start px-6 h-[400px] md:h-[600px] lg:h-[650px]">
   <img 
     src="/mission.png" 
     alt="Our Mission"
@@ -48,7 +48,7 @@ const AboutUs = () => {
 </div>
 
   {/* Right Side - Vision & Mission (3fr) */}
-  <div className="col-span-3 flex flex-col gap-6 px-4 md:px-6">
+  <div className="col-span-3 flex flex-col gap-6 px-4 md:px-6 lg:w-230 lg:ml-40">
   <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800">Our Mission And Vision</h2>
           
           <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-700">Mission</h3>
