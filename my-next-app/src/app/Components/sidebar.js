@@ -1,34 +1,35 @@
-'use client'
-import React, { useState } from 'react';
-import ImageComponent from "./imageComponent"; 
-import Link from 'next/link';
+"use client";
+
+import React, { useState } from "react";
+import ImageComponent from "./imageComponent";
+import Link from "next/link";
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Controls mobile menu
 
   return (
     <div className="flex">
       {/* Sidebar */}
       <div
-        className={`bg-[#A68F7B] text-white 
-                    fixed h-screen transition-all 
-                    duration-300 z-10 
-                    ${isOpen ? 'w-64' : 'w-0 overflow-hidden'}`}
+        className={`bg-[#A68F7B] text-white fixed h-screen w-64 z-10 p-6 
+                    transition-all duration-300 ease-in-out
+                    ${isOpen ? "translate-x-0" : "-translate-x-64"} 
+                    md:translate-x-0`}
       >
-        {/* Sidebar content */}
-        <div className="p-4">
-          <ImageComponent 
-            src="https://i.ibb.co/BXqy2R2/michella-logo-4x.png" 
-            alt="Logo" 
-            width={80} 
-            height={80} 
-            className="w-10 h-10"
+        {/* Logo Section */}
+        <div className="flex flex-col items-center">
+          <ImageComponent
+            src="https://i.ibb.co/BXqy2R2/michella-logo-4x.png"
+            alt="Logo"
+            width={80}
+            height={80}
+            className="w-16 h-16"
           />
-          <h2 className="text-lg font-semibold mt-2">Mishatotebag</h2>
+          <h2 className="text-xl font-bold mt-2">Mishatotebag</h2>
         </div>
 
         {/* Sidebar Links */}
-        <div className="flex flex-col items-start mt-10 gap-6 text-lg px-6">
+        <div className="flex flex-col mt-10 gap-6 text-lg">
           <Link href="/" className="hover:text-gray-300">🏠 Home</Link>
           <Link href="/admin" className="hover:text-gray-300">📊 Dashboard</Link>
           <Link href="/admin/users" className="hover:text-gray-300">👥 Users</Link>
@@ -38,18 +39,21 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* Main content */}
-      <div className={`flex-1 p-4 ${isOpen ? 'ml-64' : 'ml-0'}`}>
-        {/* Toggle Button */}
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? 'Close' : 'Open'}
-        </button>
+      {/* Mobile Menu Button */}
+      <button
+        className="absolute top-5 left-5 md:hidden bg-[#A68F7B] text-white p-2 rounded"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? "✖" : "☰"}
+      </button>
+
+      {/* Main Content */}
+      <div className={`flex-1 p-4 ${isOpen ? "ml-64" : "ml-0"} md:ml-64`}>
+        {/* Page content goes here */}
       </div>
     </div>
   );
 };
 
 export default Sidebar;
+
