@@ -23,7 +23,7 @@ const LoginPage = () => {
 
         // Check if the user has the "admin" role
         if (userData.role === "admin") {
-          router.push("/dashboardProduct"); // Redirect admins to dashboardProduct
+          router.push("/admin"); // Redirect admins to dashboardProduct
         } else {
           router.push("/"); // Redirect non-admins to home page
         }

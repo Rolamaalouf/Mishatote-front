@@ -1,5 +1,5 @@
 import ProtectAdminRoute from "@/app/Components/protectedroute";
-import AdminSidebar from "./adminSidebar";
+import AdminSidebar from "./sidebar";
 
 const Dashboard = () => {
   return (
