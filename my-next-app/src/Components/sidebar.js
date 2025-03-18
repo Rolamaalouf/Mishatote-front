@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import ImageComponent from "./imageComponent"; 
 const Sidebar = () => {
   // State to manage the open/close state of the sidebar
   const [isOpen, setIsOpen] = useState(false);
@@ -18,13 +17,6 @@ const Sidebar = () => {
           }`}>
         {/* Sidebar content */}
         <div>
-<ImageComponent 
-          src="https://i.ibb.co/BXqy2R2/michella-logo-4x.png" 
-          alt="Logo" 
-          width={80} 
-          height={80} 
-          className="w-10 h-10"
-        />
         <h2>Mishatotebag</h2>
         </div>
         <div className="flex flex-col items-center mt-40 gap-10 text-2xl">
