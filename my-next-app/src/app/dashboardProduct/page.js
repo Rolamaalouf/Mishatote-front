@@ -5,18 +5,17 @@ import axios from "axios";
 import Dashboard from "../Components/dashboardLayout";
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState([]); // State for products list
-  const [newProduct, setNewProduct] = useState({ name: "", price: "", image: null }); // State for new product form
+  const [products, setProducts] = useState([]);
+  const [newProduct, setNewProduct] = useState({ name: "", price: "", image: null });
 
-  // Fetch products on page load
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
-          withCredentials: true, // Include credentials (cookies)
+          withCredentials: true,
         });
-        console.log("API Response:", data);  // Log the API response for debugging
-        setProducts(data);  // Set the products state with the fetched data
+        console.log("API Response:", data);
+        setProducts(data);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -25,7 +24,6 @@ const ProductsPage = () => {
     fetchProducts();
   }, []);
 
-  // Handle new product form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewProduct((prev) => ({
@@ -34,15 +32,13 @@ const ProductsPage = () => {
     }));
   };
 
-  // Handle image file change
   const handleImageChange = (e) => {
     setNewProduct((prev) => ({
       ...prev,
-      image: e.target.files[0], // Save the selected file
+      image: e.target.files[0],
     }));
   };
 
-  // Handle form submission for adding new product
   const handleAddProduct = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -58,13 +54,13 @@ const ProductsPage = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-          withCredentials: true, // Include credentials (cookies)
+          withCredentials: true,
         }
       );
 
       console.log("New Product Response:", response.data);
-      setProducts((prev) => [...prev, response.data]); // Update the list of products
-      setNewProduct({ name: "", price: "", image: null }); // Clear form
+      setProducts((prev) => [...prev, response.data]);
+      setNewProduct({ name: "", price: "", image: null });
     } catch (error) {
       console.error("Error adding product:", error);
     }
@@ -167,3 +163,4 @@ const ProductsPage = () => {
 };
 
 export default ProductsPage;
+
