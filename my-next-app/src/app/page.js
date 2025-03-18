@@ -8,6 +8,7 @@ import Footer from "@/app/Components/footer";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
+
 export default function Home() {
   const { user } = useAuth();  // Get the user from context
   const [products, setProducts] = useState([]);
