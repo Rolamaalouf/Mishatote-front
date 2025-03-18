@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import DashboardLayout from "@/app/Components/dashboardlayout";
+import Dashboard from "../Components/dashboardLayout";
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]); // State for products list
@@ -71,7 +71,7 @@ const ProductsPage = () => {
   };
 
   return (
-    <DashboardLayout>
+    <Dashboard>
       <h1 className="text-2xl font-bold mb-4">Products</h1>
 
       {/* Add Product Form */}
@@ -162,7 +162,7 @@ const ProductsPage = () => {
           )}
         </tbody>
       </table>
-    </DashboardLayout>
+    </Dashboard>
   );
 };
 
