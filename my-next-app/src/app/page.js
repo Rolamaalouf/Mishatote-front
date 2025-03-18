@@ -68,6 +68,23 @@ export default function Home() {
             }}
           ></div>
         </div>
+      {/* Hero Section with Background */}
+      <div className="relative w-full h-screen mb-100">
+        {/* Background Image as Cover */}
+        <div className="absolute inset-0 -z-10">
+          <div
+            className="w-full h-screen min-h-screen bg-cover bg-center bg-no-repeat mb-20"
+            style={{
+              backgroundImage: "url('https://i.ibb.co/ds9Yxb11/Group-5.png')",
+              height: "140vh", // Ensures full viewport height
+              minHeight: "700px", // Fallback for smaller screens
+              backgroundSize: "cover",
+              top: "-50px",
+              position: "absolute",
+              backgroundPosition: "center",
+            }}
+          ></div>
+        </div>
 
         {/* Hero Content - Placed on Top of Image */}
         <div className="absolute left-20 transform -translate-y-1/2 flex flex-col items-center space-y-6 mt-120">
@@ -141,10 +158,12 @@ export default function Home() {
         <div className="absolute top-30 right-0 transform -translate-x-1/2 text-center text-xl font-semibold text-black z-50">
           <p>Welcome back, {user.name}!</p>
         </div>
+        <div className="absolute top-30 right-0 transform -translate-x-1/2 text-center text-xl font-semibold text-black z-50">
+          <p>Welcome back, {user.name}!</p>
+        </div>
       )}
-
-      {/* Footer */}
-      <Footer />
+            {/* Footer */}
+            <Footer />
     </div>
   );
 }

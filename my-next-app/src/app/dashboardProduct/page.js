@@ -5,8 +5,8 @@ import axios from "axios";
 import Dashboard from "../Components/dashboardLayout";
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({ name: "", price: "", image: null });
+  const [products, setProducts] = useState([]); // State for products list
+  const [newProduct, setNewProduct] = useState({ name: "", price: "", image: null }); // State for new product form
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -14,8 +14,8 @@ const ProductsPage = () => {
         const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
           withCredentials: true,
         });
-        console.log("API Response:", data);
-        setProducts(data);
+        console.log("API Response:", data);  // Log the API response for debugging
+        setProducts(data);  // Set the products state with the fetched data
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -67,7 +67,7 @@ const ProductsPage = () => {
   };
 
   return (
-    <Dashboard>
+    <DashboardLayout>
       <h1 className="text-2xl font-bold mb-4">Products</h1>
 
       {/* Add Product Form */}
@@ -158,7 +158,7 @@ const ProductsPage = () => {
           )}
         </tbody>
       </table>
-    </Dashboard>
+    </DashboardLayout>
   );
 };
 
