@@ -1,11 +1,11 @@
-import DashboardLayout from "@/app/Components/dashboardLayout";
+import Dashboard from "@/app/admin/layout";
 
 const UsersPage = () => {
   return (
-    <DashboardLayout>
+    <Dashboard>
       <h1 className="text-2xl font-bold">Manage Users</h1>
       {/* Add users table, actions, etc. here */}
-    </DashboardLayout>
+    </Dashboard>
   );
 };
 

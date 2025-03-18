@@ -1,11 +1,11 @@
-import DashboardLayout from "@/app/Components/dashboardLayout";
+import Dashboard from "@/app/admin/layout";
 
 const ReportsPage = () => {
   return (
-    <DashboardLayout>
+    <Dashboard>
       <h1 className="text-2xl font-bold">Reports</h1>
       {/* Display financial/analytical reports here */}
-    </DashboardLayout>
+    </Dashboard>
   );
 };
 

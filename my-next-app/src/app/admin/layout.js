@@ -1,12 +1,15 @@
 import Sidebar from "@/app/Components/sidebar";
+import ProtectAdminRoute from "../Components/protectedroute";
 
-export default function AdminLayout({ children }) {
+const Dashboard = () => {
   return (
-    <div className="flex">
-      {/* Sidebar on the left */}
-      <Sidebar />
-      {/* Main content area */}
-      <main className="flex-1 p-6">{children}</main>
-    </div>
+    <ProtectAdminRoute>
+      <Sidebar>
+        <h1>Admin Dashboard</h1>
+      </Sidebar>
+    </ProtectAdminRoute>
   );
-}
+};
+
+export default Dashboard;
+
