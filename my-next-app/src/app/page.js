@@ -1,51 +1,70 @@
-'use client';
+// pages/index.js
+"use client";
 
-// pages/index.js (Home Component)
 import Head from "next/head";
-import Header from "@/Components/header";
+import Header from "@/app/Components/header";
 import { useAuth } from '@/context/AuthContext';  // Import the AuthContext
+import Footer from "@/app/Components/footer";
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 
 export default function Home() {
   const { user } = useAuth();  // Get the user from context
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
+          withCredentials: true,
+        });
+        console.log("API Response:", data);
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
-<div className="relative w-full min-h-screen">
-  <div className="relative z-50">
-    <Header />
-  </div>
+    <div className="relative w-full min-h-screen ">
+      <div className="relative z-50">
+        <Header />
+      </div>
 
-  {/* Hero Section with Background */}
-  <div className="relative w-full h-screen mb-120">
-    {/* Background Image as Cover */}
-    <div className="absolute inset-0 -z-10">
-  <div
-    className="w-full h-screen min-h-screen bg-cover bg-center bg-no-repeat"
-    style={{
-      backgroundImage: "url('https://i.ibb.co/gMq6XGrT/Group-2-1.png')",
-      height: "150vh", // Ensures full viewport height
-      minHeight: "700px", // Fallback for smaller screens
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }}
-  ></div>
-</div>
+      {/* Hero Section with Background */}
+      <div className="relative w-full h-screen mb-100">
+        {/* Background Image as Cover */}
+        <div className="absolute inset-0 -z-10">
+          <div
+            className="w-full h-screen min-h-screen bg-cover bg-center bg-no-repeat mb-20"
+            style={{
+              backgroundImage: "url('https://i.ibb.co/ds9Yxb11/Group-5.png')",
+              height: "140vh", // Ensures full viewport height
+              minHeight: "700px", // Fallback for smaller screens
+              backgroundSize: "cover",
+              top: "-50px",
+              position: "absolute",
+              backgroundPosition: "center",
+            }}
+          ></div>
+        </div>
 
+        {/* Hero Content - Placed on Top of Image */}
+        <div className="absolute left-20 transform -translate-y-1/2 flex flex-col items-center space-y-6 mt-120">
+          <h1 className="font-belleza text-[10vw] md:text-[100px] leading-tight text-black mt-80">
+            Carry your DREAMS <br/>  
+            <span className="whitespace-nowrap">in a tote</span>
+          </h1>
+          <button className="absolute ml-50 mt-120 px-10 py-4 text-3xl font-semibold bg-[#4A8C8C] text-white rounded">
+            Collections
+          </button>
+        </div>
 
-    {/* Hero Content - Placed on Top of Image */}
-    <div className="absolute top-4/4 left-20 transform -translate-y-1/2 flex flex-col items-center space-y-6">
-  <h1 className="font-belleza text-[10vw] md:text-[110px] leading-tight text-black">
-    Carry your <br /> DREAMS <br/>  
-    <span className="whitespace-nowrap">in a tote</span>
-  </h1>
-  <button className="mr-50 px-10 py-4 text-3xl font-semibold bg-[#4A8C8C] text-white rounded">
-    Collections
-  </button>
-</div>
-
-  </div>
-
-
+      </div>
 
       {/* New Section Below Background */}
       <div className="relative z-20 w-full flex flex-col items-center text-center">
@@ -76,12 +95,41 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Customer Favorites Section */}
+      <h2 className="text-2xl font-bold mt-6 mb-4 text-center">Customer Favorites</h2>
+      <div className="grid grid-cols-3 gap-4">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <div key={product.id} className="bg-white shadow-md rounded-lg p-4">
+              {product.image && (() => {
+                try {
+                  const parsedImage = JSON.parse(product.image);
+                  const imageUrl = parsedImage[0];
+                  return (
+                    <img src={imageUrl} alt={product.name} className="h-32 mx-auto" />
+                  );
+                } catch (error) {
+                  console.error("Error parsing image:", error);
+                  return "No Image";
+                }
+              })()}
+              <h3 className="text-lg font-bold mt-2">{product.name}</h3>
+              <p className="text-lg">${product.price}</p>
+            </div>
+          ))
+        ) : (
+          <div className="text-center">No products available.</div>
+        )}
+      </div>
+
       {/* Display Welcome Message if User is Logged In */}
       {user && (
-        <div className="text-center mt-12 mb-6 text-xl font-semibold text-black">
+        <div className="absolute top-30 right-0 transform -translate-x-1/2 text-center text-xl font-semibold text-black z-50">
           <p>Welcome back, {user.name}!</p>
         </div>
       )}
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

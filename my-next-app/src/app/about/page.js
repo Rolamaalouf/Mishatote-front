@@ -1,7 +1,7 @@
 'use client';
 
 
-import Header from '@/Components/header';
+import Header from '@/app/Components/header';
 const AboutUs = () => {
   return (
     <div className="px-6 py-12 bg-gray-100">
