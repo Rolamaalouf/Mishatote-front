@@ -1,7 +1,10 @@
-"use client";
+const DashboardPage = () => {
+    return (
+        <div className="p-4">
+          <h1 className="text-2xl font-bold">Manage Reports</h1>
+          {/* Add users table, actions, etc. here */}
+        </div>
+      );
+    };
 
-import Dashboard from "./layout"; // Import the layout file
-
-export default function AdminDashboard() {
-  return <Dashboard />;
-}
+export default DashboardPage;

@@ -35,7 +35,6 @@ const Sidebar = () => {
           <Link href="/admin/users" className="hover:text-gray-300">👥 Users</Link>
           <Link href="/admin/products" className="hover:text-gray-300">🛍 Products</Link>
           <Link href="/admin/orders" className="hover:text-gray-300">📦 Orders</Link>
-          <Link href="/admin/reports" className="hover:text-gray-300">📑 Reports</Link>
         </div>
       </div>
 

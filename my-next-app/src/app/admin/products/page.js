@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Dashboard from "@/app/admin/layout";
+
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -23,7 +23,6 @@ const ProductsPage = () => {
   }, []);
 
   return (
-    <Dashboard>
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">Manage Products</h1>
         {loading ? (
@@ -40,7 +39,6 @@ const ProductsPage = () => {
           <p>No products found.</p>
         )}
       </div>
-    </Dashboard>
   );
 };
 
