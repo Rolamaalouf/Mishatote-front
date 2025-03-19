@@ -7,24 +7,25 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined); // Start with undefined to differentiate between loading & not logged in
   const router = useRouter();
 
-  // Fetch user details from the backend when app loads (on cookie)
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
           method: "GET",
-          credentials: "include", // Ensure cookies are sent
+          credentials: "include", // Include cookies in the request
         });
 
         if (response.ok) {
           const userData = await response.json();
           setUser(userData.user);
+        } else {
+          setUser(null);
         }
       } catch (error) {
-        setUser(null); // Clear user if not logged in
+        setUser(null);
       }
     };
 
@@ -45,6 +46,12 @@ export const AuthProvider = ({ children }) => {
 
       const userData = await response.json();
       setUser(userData.user);
+
+      // Redirect after login if `redirect` exists in URL
+      const params = new URLSearchParams(window.location.search);
+      const redirectTo = params.get("redirect") || "/checkout"; // Default to checkout if no redirect param
+      router.push(redirectTo);
+
       return userData.user;
     } catch (err) {
       throw new Error("Login failed. Check credentials.");
@@ -56,12 +63,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/logout`, {
         method: "POST",
-        credentials: "include", // Ensure cookies are sent
+        credentials: "include",
       });
 
       if (response.ok) {
-        setUser(null); // Clear user on logout
-        router.push("/login"); // Redirect to login page
+        setUser(null);
+        router.push("/login");
       }
     } catch (error) {
       console.error("Error logging out:", error);

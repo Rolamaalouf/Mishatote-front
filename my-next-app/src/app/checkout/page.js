@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import Checkout from "@/app/Components/Checkout";
-import Header from "@/app/Components/header";
+import Checkout from "../Components/Checkout";
+import Header from "../Components/header";
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -12,13 +12,13 @@ export default function CheckoutPage() {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (user === undefined) return;  
     if (user === null) {
       router.push(`/login?redirect=${pathname}`);
     }
   }, [user, router, pathname]);
 
-  if (user === undefined) return null;  
-  if (user === null) return null;  
+  if (user === undefined || user === null) return null;  
 
   return (
     <>
