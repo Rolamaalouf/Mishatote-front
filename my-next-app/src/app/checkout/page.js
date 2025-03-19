@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import Checkout from "@/Components/Checkout";
-import Header from "@/Components/header";
+import Checkout from "@/app/Components/Checkout";
+import Header from "@/app/Components/header";
 
 export default function CheckoutPage() {
   const { user } = useAuth();

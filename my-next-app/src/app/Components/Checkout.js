@@ -5,7 +5,7 @@ import { FaCreditCard, FaMoneyBillWave, FaArrowLeft, FaHome } from "react-icons/
 import { useRouter } from "next/navigation"
 import axios from "axios"
 import { useAuth } from "@/context/AuthContext"
-import ProgressBar from "@/components/ProgressBar"
+import ProgressBar from "@/app/Components/ProgressBar"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
