@@ -17,6 +17,7 @@ export default function CartPage() {
   // Fetch cart items
   useEffect(() => {
     const fetchCart = async () => {
+      console.log("API URL:", process.env.NEXT_PUBLIC_API_URL); // Debugging line
       try {
         setLoading(true)
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
