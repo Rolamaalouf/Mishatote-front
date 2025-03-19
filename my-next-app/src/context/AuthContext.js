@@ -4,68 +4,65 @@ import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined); // Use `undefined` to differentiate between "checking" and "logged out"
   const router = useRouter();
 
-  // Fetch user details from the backend when app loads (on cookie)
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
-          method: "GET",
-          credentials: "include", // Ensure cookies are sent
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData.user);
-        }
-      } catch (error) {
-        setUser(null); // Clear user if not logged in
-      }
-    };
-
-    fetchUser();
+    checkAuthStatus();
   }, []);
 
-  // Login function
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Session expired");
+      }
+
+      const userData = await response.json();
+      setUser(userData); // Store session user
+    } catch (error) {
+      console.error("Session expired. Logging out...");
+      setUser(null); // Only logout if session is truly expired
+    }
+  };
+
   const login = async ({ email, password }) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
-        credentials: "include", // Ensure cookies are sent
       });
 
-      if (!response.ok) throw new Error("Login failed");
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
 
       const userData = await response.json();
       setUser(userData.user);
-      return userData.user;
+      return true;
     } catch (err) {
       throw new Error("Login failed. Check credentials.");
     }
   };
 
-  // Logout function
   const logout = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/logout`, {
-        method: "POST",
-        credentials: "include", // Ensure cookies are sent
-      });
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
 
-      if (response.ok) {
-        setUser(null); // Clear user on logout
-        router.push("/login"); // Redirect to login page
-      }
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
+    setUser(null);
+    router.push("/login"); // Redirect to login
   };
 
   return (
