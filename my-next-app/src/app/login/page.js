@@ -1,17 +1,25 @@
-// pages/login.js (or wherever the login page is)
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { login } = useAuth();
   const router = useRouter();
-  const [error, setError] = useState('');
+  const searchParams = useSearchParams(); // Correctly used inside a client component
+  const [redirect, setRedirect] = useState("/"); // Default redirect
+
+  const [error, setError] = useState("");
+
+  // Use effect to set redirect URL from search params
+  useEffect(() => {
+    const redirectUrl = searchParams.get("redirect");
+    if (redirectUrl) setRedirect(redirectUrl);
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,10 +27,10 @@ const LoginPage = () => {
       const userData = await login({ email, password });
 
       if (userData) {
-        router.push('/');  // Redirect to home page
+        router.push(redirect); // Redirect back to checkout or intended page
       }
     } catch (err) {
-      setError('Login failed. Please check your credentials and try again.');
+      setError("Login failed. Please check your credentials and try again.");
     }
   };
 
@@ -63,7 +71,6 @@ const LoginPage = () => {
           Register here
         </Link>
       </p>
-
     </div>
   );
 };
