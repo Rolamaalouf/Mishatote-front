@@ -19,7 +19,7 @@ export default function CartPage() {
     const fetchCart = async () => {
       try {
         setLoading(true)
-        const response = await axios.get("/api/cart", {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -53,7 +53,7 @@ export default function CartPage() {
 
       // Then update on server using axios
       await axios.post(
-        "/api/cart",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/cart`,
         {
           product_id: productId,
           quantity: newQuantity - cartItems.find((item) => item.product_id === productId)?.quantity,
@@ -67,7 +67,7 @@ export default function CartPage() {
     } catch (err) {
       console.error("Error updating quantity:", err)
       // Revert on failure
-      const response = await axios.get("/api/cart", {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -79,7 +79,7 @@ export default function CartPage() {
   // Remove from cart
   const removeFromCart = async (productId) => {
     try {
-      await axios.delete(`/api/cart/${productId}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${productId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
