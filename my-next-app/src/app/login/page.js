@@ -1,25 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ToastContainer, toast } from 'react-toastify';
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams(); // Correctly used inside a client component
-  const [redirect, setRedirect] = useState("/"); // Default redirect
-
   const [error, setError] = useState("");
-
-  // Use effect to set redirect URL from search params
-  useEffect(() => {
-    const redirectUrl = searchParams.get("redirect");
-    if (redirectUrl) setRedirect(redirectUrl);
-  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,17 +19,25 @@ const LoginPage = () => {
       const userData = await login({ email, password });
 
       if (userData) {
-        router.push(redirect); // Redirect back to checkout or intended page
+        toast.success('Login successful');
+
+        // Check if the user has the "admin" role
+        if (userData.role === "admin") {
+          router.push("/admin"); // Redirect admins to dashboardProduct
+        } else {
+          router.push("/"); // Redirect non-admins to home page
+        }
       }
     } catch (err) {
+      toast.error('Invalid email or password');
       setError("Login failed. Please check your credentials and try again.");
     }
   };
 
   return (
     <div className="flex h-screen">
-         <ToastContainer
-        position="bottom-right"
+      <ToastContainer
+        position="top-left"
         autoClose={4001}
         limit={4}
         hideProgressBar={false}
