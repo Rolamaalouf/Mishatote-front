@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "@/Components/sidebar";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
-
+/* import Link from "next/link";  */
+import { useRouter } from "next/navigation";
 const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [error, setError] = useState("");
@@ -26,8 +27,6 @@ const Orders = () => {
         }
     };
 
-
-    //delete
     const deleteOrder = async (orderId) => {
         try {
             const response = await axios.delete(`http://localhost:5000/api/orders/${orderId}`, {
@@ -35,7 +34,6 @@ const Orders = () => {
             });
 
             if (response.status === 200) {
-                
                 setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
             }
         } catch (err) {
@@ -43,6 +41,13 @@ const Orders = () => {
             setError("Unable to delete order");
         }
     };
+
+    const router = useRouter();
+
+    const handleClick = (orderId) => {
+      router.push(`/orders/orderItems/${orderId}`);
+    };
+
     useEffect(() => {
         getOrders();
     }, []);
@@ -69,9 +74,14 @@ const Orders = () => {
                                 <td className="px-6 py-4 text-sm text-gray-700 text-center">${order.total_price}</td>
                                 <td className="px-6 py-4 text-sm">
                                     <div className="flex justify-center items-center space-x-4">
-                                        <button className="text-blue-500 hover:text-blue-700">
-                                            <FaEye className="h-5 w-5" />
-                                        </button>
+                                    <button
+                  className="text-blue-500 hover:text-blue-700"
+                  onClick={() => handleClick(order.id)}
+                >
+  
+    <FaEye className="h-5 w-5" />
+  </button>
+
 
                                         <button
                                             className="text-red-500 hover:text-red-700"
@@ -81,7 +91,6 @@ const Orders = () => {
                                         </button>
                                     </div>
                                 </td>
-
                             </tr>
                         ))}
                     </tbody>
