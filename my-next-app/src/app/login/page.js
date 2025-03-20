@@ -36,8 +36,8 @@ const LoginPage = () => {
 
   return (
     <div className="flex h-screen">
-         <ToastContainer
-        position="bottom-right"
+      <ToastContainer
+        position="top-left"
         autoClose={4001}
         limit={4}
         hideProgressBar={false}
