@@ -5,18 +5,18 @@ import Header from "@/app/Components/header";
 import Footer from "@/app/Components/footer";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaSearch, FaShoppingCart } from "react-icons/fa"; // Cart icon
-import { useRouter } from "next/navigation";
+import { FaShoppingCart } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import styles
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedProduct, setSelectedProduct] = useState(null); // For popup
-  const [selectedSize, setSelectedSize] = useState(null);
-  const router = useRouter();
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [cartItems, setCartItems] = useState([]);
 
+  // Fetch products on load
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -30,20 +30,49 @@ export default function Products() {
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, []);
 
-  // Handle adding to cart
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      toast.error("Please select a size before adding to cart!");
-      return;
-    }
+  // Fetch cart items on load
+  useEffect(() => {
+    fetchCartItems();
+  }, []);
 
-    // Add product to cart (dummy logic, replace with actual cart function)
-    toast.success(`${selectedProduct.name} added to cart!`);
-    setSelectedProduct(null); // Close popup after adding
+  const fetchCartItems = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+        withCredentials: true,
+      });
+      setCartItems(data);
+    } catch (error) {
+      console.error("Fetch Cart Error:", error);
+    }
+  };
+
+  // Open Popup and Reset Quantity
+  const openCartPopup = (product) => {
+    setSelectedProduct(product);
+    setQuantity(1);
+  };
+
+  // Handle Add to Cart
+  const handleAddToCart = async () => {
+    if (!selectedProduct) return;
+
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/cart/add`,
+        { product_id: selectedProduct.id, quantity },
+        { withCredentials: true }
+      );
+
+      toast.success(`Added ${quantity} item(s) to cart!`);
+      fetchCartItems(); // Update cart in real-time
+      setSelectedProduct(null); // Close popup
+    } catch (error) {
+      console.error("Add to Cart Error:", error);
+      toast.error("Failed to add item to cart!");
+    }
   };
 
   return (
@@ -55,47 +84,38 @@ export default function Products() {
       <Header />
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
 
-      {/* Green Header Block */}
       <div className="relative w-full bg-[#4A8C8C] h-[10cm] flex items-center justify-center">
         <h1 className="text-white text-4xl font-bold absolute bottom-40">Products</h1>
-        <img
-          src="https://i.ibb.co/qM9PD8BR/A-flat-lay-image-of-three-cotton-tote-bags-with-colorful-designs-The-first-tote-features-a-vibrant-f.png"
-          alt="Tote Bag"
-          className="absolute bottom-[-150px] w-[600px] h-70 border-2 border-[#A68F7B]"
-        />
       </div>
 
-      {/* Products List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-10 mt-50">
         {loading ? (
           <p>Loading products...</p>
         ) : (
           products.map((product) => (
             <div key={product.id} className="border p-4 rounded-lg shadow-lg text-center relative">
-              {/* Product Image */}
               <img
                 src={product.image}
                 alt={product.name}
                 className="w-full h-[200px] object-cover mb-2 border-2 border-[#A68F7B] rounded"
-                onError={(e) => (e.target.src = "/placeholder.jpg")} // Fallback image
+                onError={(e) => (e.target.src = "/placeholder.jpg")}
               />
 
               <h3 className="text-lg font-bold">{product.name}</h3>
               <p className="text-gray-600">${product.price}</p>
 
-              {/* Cart Button */}
               <button
-                className="absolute top-4 right-4 text-[#4A8C8C] bg-white p-2 rounded-full shadow-md"
-                onClick={() => setSelectedProduct(product)}
+                className="mt-4 bg-[#4A8C8C] text-white px-6 py-2 rounded w-full"
+                onClick={() => openCartPopup(product)}
               >
-                <FaShoppingCart size={20} />
+                Add to Cart
               </button>
             </div>
           ))
         )}
       </div>
 
-      {/* Product Details Popup */}
+      {/* Popup Modal for Quantity Selection */}
       {selectedProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
@@ -104,24 +124,25 @@ export default function Products() {
               src={selectedProduct.image}
               alt={selectedProduct.name}
               className="w-full h-[200px] object-cover border-2 border-[#A68F7B] rounded my-2"
-              onError={(e) => (e.target.src = "/placeholder.jpg")}
             />
             <p className="text-gray-700">{selectedProduct.description}</p>
             <p className="text-gray-600">${selectedProduct.price}</p>
 
-            {/* Size Selection */}
-            <div className="flex justify-center my-4 space-x-2">
-              {["S", "M", "L"].map((size) => (
-                <button
-                  key={size}
-                  className={`px-4 py-2 border rounded ${
-                    selectedSize === size ? "bg-[#4A8C8C] text-white" : "bg-gray-200"
-                  }`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
+            {/* Quantity Controls */}
+            <div className="flex items-center justify-center my-4">
+              <button
+                className="bg-gray-300 px-4 py-2 rounded-l"
+                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+              >
+                -
+              </button>
+              <span className="px-6">{quantity}</span>
+              <button
+                className="bg-gray-300 px-4 py-2 rounded-r"
+                onClick={() => setQuantity((prev) => prev + 1)}
+              >
+                +
+              </button>
             </div>
 
             {/* Add to Cart Button */}
@@ -129,7 +150,7 @@ export default function Products() {
               className="mt-4 bg-[#4A8C8C] text-white px-6 py-2 rounded w-full"
               onClick={handleAddToCart}
             >
-              Add to Cart
+              Confirm
             </button>
 
             {/* Close Button */}
@@ -147,4 +168,3 @@ export default function Products() {
     </div>
   );
 }
-
