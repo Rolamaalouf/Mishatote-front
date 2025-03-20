@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Sidebar from "@/Components/sidebar";
+import Sidebar from "../Components/sidebar";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 /* import Link from "next/link";  */
 import { useRouter } from "next/navigation";
@@ -44,8 +44,10 @@ const Orders = () => {
 
     const router = useRouter();
 
-    const handleClick = (orderId) => {
-      router.push(`/orders/orderItems/${orderId}`);
+    const handleClick = () => {
+       
+      router.push(`/orders/[orderId]`);
+    
     };
 
     useEffect(() => {
@@ -53,14 +55,14 @@ const Orders = () => {
     }, []);
 
     return (
-        <div className="flex">
-            <Sidebar />
+        <div className="flex p-4">
+          <h1 className="text-2xl font-bold">Manage Orders</h1>
             <div className="flex-1 p-6">
                 {error && <p className="text-red-500">{error}</p>}
                 <table className="min-w-full table-auto border-collapse bg-white shadow-md rounded-lg lg:mt-20">
                     <thead className="bg-gray-100">
                         <tr>
-                            <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700 ">User Name</th>
+                            <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700 ">User ID</th>
                             <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Status</th>
                             <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Total Price</th>
                             <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Action</th>
