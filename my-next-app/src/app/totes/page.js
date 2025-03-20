@@ -5,13 +5,16 @@ import Header from "@/app/Components/header";
 import Footer from "@/app/Components/footer";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaSearch } from "react-icons/fa"; // Magnifier icon
+import { FaSearch, FaShoppingCart } from "react-icons/fa"; // Cart icon
 import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import styles
 
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null); // For popup
+  const [selectedSize, setSelectedSize] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,19 +34,16 @@ export default function Products() {
     fetchProducts();
   }, []);
 
-  // Function to handle image parsing
-  const parseProductImage = (imageData) => {
-    try {
-      if (typeof imageData === "string") {
-        return imageData; // If it's a string, return directly
-      } else if (Array.isArray(imageData) && imageData.length > 0) {
-        return imageData[0]; // Return first image if it's an array
-      }
-      return "/placeholder.jpg"; // Fallback image if no valid image found
-    } catch (error) {
-      console.error("Error parsing image:", error);
-      return "/placeholder.jpg"; // Fallback image
+  // Handle adding to cart
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      toast.error("Please select a size before adding to cart!");
+      return;
     }
+
+    // Add product to cart (dummy logic, replace with actual cart function)
+    toast.success(`${selectedProduct.name} added to cart!`);
+    setSelectedProduct(null); // Close popup after adding
   };
 
   return (
@@ -53,6 +53,7 @@ export default function Products() {
       </Head>
 
       <Header />
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
 
       {/* Green Header Block */}
       <div className="relative w-full bg-[#4A8C8C] h-[10cm] flex items-center justify-center">
@@ -70,32 +71,24 @@ export default function Products() {
           <p>Loading products...</p>
         ) : (
           products.map((product) => (
-            <div key={product.id} className="border p-4 rounded-lg shadow-lg text-center">
+            <div key={product.id} className="border p-4 rounded-lg shadow-lg text-center relative">
               {/* Product Image */}
               <img
-                src={parseProductImage(product.image)}
+                src={product.image}
                 alt={product.name}
                 className="w-full h-[200px] object-cover mb-2 border-2 border-[#A68F7B] rounded"
-                onError={(e) => (e.target.src = "/placeholder.jpg")} // Show placeholder if broken
+                onError={(e) => (e.target.src = "/placeholder.jpg")} // Fallback image
               />
 
               <h3 className="text-lg font-bold">{product.name}</h3>
               <p className="text-gray-600">${product.price}</p>
 
-              {/* Magnifier Icon for Product Details */}
+              {/* Cart Button */}
               <button
-                className="text-[#4A8C8C] mt-2"
+                className="absolute top-4 right-4 text-[#4A8C8C] bg-white p-2 rounded-full shadow-md"
                 onClick={() => setSelectedProduct(product)}
               >
-                <FaSearch size={20} />
-              </button>
-
-              {/* Add to Cart Button */}
-              <button
-                className="block w-full mt-4 bg-[#4A8C8C] text-white py-2 rounded"
-                onClick={() => router.push("/cart")}
-              >
-                Add to Cart
+                <FaShoppingCart size={20} />
               </button>
             </div>
           ))
@@ -105,17 +98,41 @@ export default function Products() {
       {/* Product Details Popup */}
       {selectedProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center overflow-y-auto max-h-[80vh]">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
             <h2 className="text-xl font-bold">{selectedProduct.name}</h2>
             <img
-              src={parseProductImage(selectedProduct.image)}
+              src={selectedProduct.image}
               alt={selectedProduct.name}
               className="w-full h-[200px] object-cover border-2 border-[#A68F7B] rounded my-2"
               onError={(e) => (e.target.src = "/placeholder.jpg")}
             />
             <p className="text-gray-700">{selectedProduct.description}</p>
-            <p className="text-gray-600">Size: {selectedProduct.size}</p>
-            <p className="text-gray-600">Color: {selectedProduct.color}</p>
+            <p className="text-gray-600">${selectedProduct.price}</p>
+
+            {/* Size Selection */}
+            <div className="flex justify-center my-4 space-x-2">
+              {["S", "M", "L"].map((size) => (
+                <button
+                  key={size}
+                  className={`px-4 py-2 border rounded ${
+                    selectedSize === size ? "bg-[#4A8C8C] text-white" : "bg-gray-200"
+                  }`}
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+
+            {/* Add to Cart Button */}
+            <button
+              className="mt-4 bg-[#4A8C8C] text-white px-6 py-2 rounded w-full"
+              onClick={handleAddToCart}
+            >
+              Add to Cart
+            </button>
+
+            {/* Close Button */}
             <button
               className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
               onClick={() => setSelectedProduct(null)}
@@ -130,3 +147,4 @@ export default function Products() {
     </div>
   );
 }
+

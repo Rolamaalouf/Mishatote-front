@@ -20,10 +20,8 @@ export default function CartPage() {
       console.log("API URL:", process.env.NEXT_PUBLIC_API_URL); // Debugging line
       try {
         setLoading(true)
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+          withCredentials: true, // Enable credentials
         })
 
         // Assuming the backend returns cart items with product details
@@ -60,18 +58,14 @@ export default function CartPage() {
           quantity: newQuantity - cartItems.find((item) => item.product_id === productId)?.quantity,
         },
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          withCredentials: true, // Enable credentials
         },
       )
     } catch (err) {
       console.error("Error updating quantity:", err)
       // Revert on failure
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+        withCredentials: true, // Enable credentials
       })
       setCartItems(response.data)
     }
@@ -80,10 +74,8 @@ export default function CartPage() {
   // Remove from cart
   const removeFromCart = async (productId) => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`, {
+        withCredentials: true, // Enable credentials
       })
 
       // Update local state
