@@ -218,9 +218,11 @@ useEffect(() => {
                 </div>
 
                 {/* Checkout Button */}
+                <Link href='/checkout'>
                 <button className="w-full bg-[#4A8C8C] text-white py-3 rounded-md hover:bg-[#3a7070] transition mt-6 font-medium text-lg">
                   Checkout
                 </button>
+                </Link>
               </div>
             </div>
           </div>
