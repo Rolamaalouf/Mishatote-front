@@ -1,9 +1,12 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
+import { FiFilter } from "react-icons/fi";
 
 export default function AdminProductsPage() {
   const { user } = useAuth();
@@ -17,11 +20,14 @@ export default function AdminProductsPage() {
   });
 
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [categories, setCategories] = useState([]);
 
-  // ✅ **Fetch products from API**
+  // Fetch products
   const fetchProducts = async () => {
     try {
       const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
@@ -34,11 +40,28 @@ export default function AdminProductsPage() {
     }
   };
 
+  // Fetch categories
+  const fetchCategories = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
+        withCredentials: true,
+      });
+      setCategories(data);
+    } catch (error) {
+      console.error("❌ Error fetching categories:", error);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
-  // ✅ **Handle Input Change**
+  useEffect(() => {
+    filterProducts();
+  }, [categoryFilter, products]);
+
+  // Handle Input Change
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "images") {
@@ -48,7 +71,7 @@ export default function AdminProductsPage() {
     }
   };
 
-  // ✅ **Handle Add Product**
+  // Handle Add Product
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
@@ -75,7 +98,7 @@ export default function AdminProductsPage() {
     }
   };
 
-  // ✅ **Handle Update Product**
+  // Handle Update Product
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
     try {
@@ -104,7 +127,7 @@ export default function AdminProductsPage() {
     }
   };
 
-  // ✅ **Handle Delete Product**
+  // Handle Delete Product
   const handleDeleteProduct = async (productId) => {
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, {
@@ -119,7 +142,7 @@ export default function AdminProductsPage() {
     }
   };
 
-  // ✅ **Handle Edit Mode**
+  // Handle Edit Mode
   const handleEditProduct = (product) => {
     setNewProduct({
       name: product.name,
@@ -133,7 +156,7 @@ export default function AdminProductsPage() {
     setEditProductId(product.id);
   };
 
-  // ✅ **Parse Product Image**
+  // Parse Product Image
   const parseProductImage = (imageData) => {
     if (Array.isArray(imageData) && imageData.length > 0) {
       return imageData[0]; // Return first image URL
@@ -141,11 +164,20 @@ export default function AdminProductsPage() {
     return "";
   };
 
+  // Filter Products by Category
+  const filterProducts = () => {
+    if (categoryFilter === "all") {
+      setFilteredProducts(products);
+    } else {
+      setFilteredProducts(products.filter((product) => product.category_id === parseInt(categoryFilter)));
+    }
+  };
+
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4">Admin - Manage Products</h1>
 
-      {/* ✅ **Add or Edit Product Form** */}
+      {/* Add or Edit Product Form */}
       <h2 className="text-xl font-bold mb-3">{editMode ? "Edit Product" : "Add New Product"}</h2>
       <form onSubmit={editMode ? handleUpdateProduct : handleAddProduct} className="mb-6 grid gap-4">
         <input type="text" name="name" placeholder="Product Name" value={newProduct.name} onChange={handleInputChange} className="border p-2 rounded" required />
@@ -165,25 +197,37 @@ export default function AdminProductsPage() {
         )}
       </form>
 
-      {/* ✅ **Display Existing Products** */}
+      {/* Filter by Category */}
+      <div className="flex items-center mb-4">
+        <label className="mr-2">Filter by Category:</label>
+        <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="border p-2 rounded">
+          <option value="all">All</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+        <FiFilter className="ml-2 text-lg" />
+      </div>
+
+      {/* Display Existing Products */}
       <h2 className="text-xl font-bold mt-4 mb-2">Product List</h2>
-      {products.length > 0 ? (
+      {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <div key={product.id} className="bg-gray-100 p-4 rounded-md shadow">
               <img src={parseProductImage(product.image)} alt={product.name} className="h-32 mx-auto" />
               <h3 className="text-lg font-semibold">{product.name}</h3>
               <p>${product.price}</p>
-              <button className="px-3 py-1 mt-2 rounded transition" style={{ backgroundColor: "#A68F7B", color: "white" }} onClick={() => handleEditProduct(product)}>
-                Edit
-              </button>
-              <button
-  className="px-3 py-1 mt-2 ml-5 rounded text-white"
-  style={{ backgroundColor: '#A68F7B' }}
-  onClick={() => handleDeleteProduct(product.id)}
->
-  Delete
-</button>
+              <div className="flex justify-between mt-2">
+                <button className="px-3 py-1 rounded transition bg-[#A68F7B] text-white" onClick={() => handleEditProduct(product)}>
+                  <AiOutlineEdit className="inline-block h-5 w-5" />
+                </button>
+                <button className="px-3 py-1 rounded transition bg-red-500 text-white" onClick={() => handleDeleteProduct(product.id)}>
+                  <AiOutlineDelete className="inline-block h-5 w-5" />
+                </button>
+              </div>
             </div>
           ))}
         </div>

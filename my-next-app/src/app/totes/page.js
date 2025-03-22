@@ -102,11 +102,6 @@ export default function Products() {
 
       toast.success(`Added ${quantity} item(s) to cart!`);
 
-      setTimeout(() => {
-        if (isAuthenticated) {
-          router.push("/cart");
-        }
-      }, 1000);
 
       setSelectedProduct(null);
     } catch (error) {
@@ -121,7 +116,7 @@ export default function Products() {
   );
 
   return (
-    <div className="relative w-full min-h-screen">
+    <div className="relative w-full min-h-screen mt-20 px-6 py-12">
       <Head>
         <title>Products</title>
       </Head>
@@ -130,7 +125,7 @@ export default function Products() {
       <ToastContainer position="top-right" autoClose={3000} />
 
       {/* Brown Section */}
-      <div className="relative w-full h-[10cm] flex flex-col items-center justify-end bg-[#A68F7B]">
+      <div className="relative w-full h-[7cm] flex flex-col items-center justify-end bg-[#A68F7B]">
   {/* Products Text */}
   <h1 className="text-white text-4xl font-bold mb-5">Products</h1>
 
@@ -138,13 +133,13 @@ export default function Products() {
   <img
     src="https://i.ibb.co/6JYgYPSH/Whats-App-Image-2025-03-22-at-10-02-39-AM.jpg"
     alt="Products"
-    className="w-[1000px] h-[200px] object-contain mb-[-3cm]"
+    className="w-[1000px] h-[400px] object-contain mb-[-6cm]"
   />
 </div>
 
 
 {/* Filter & Sort Controls */}
-<div className="flex justify-center gap-4 my-6 mt-50"> {/* Added mt-12 to lower the section */}
+<div className="flex justify-center gap-4 my-6 mt-70"> {/* Added mt-12 to lower the section */}
   <select
     className="p-2 border rounded"
     onChange={(e) => setSelectedCategory(e.target.value)}
