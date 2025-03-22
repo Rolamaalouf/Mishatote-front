@@ -138,7 +138,7 @@ export default function Products() {
   <img
     src="https://i.ibb.co/6JYgYPSH/Whats-App-Image-2025-03-22-at-10-02-39-AM.jpg"
     alt="Products"
-    className="w-[800px] h-[300px] object-contain mb-[-3cm]"
+    className="w-[1000px] h-[200px] object-contain mb-[-3cm]"
   />
 </div>
 
