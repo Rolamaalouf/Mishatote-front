@@ -86,8 +86,7 @@ export default function CategoryManager() {
           </div>
         ))}
       </div>
- 
-      {/* Modal */}
+  
 {modalOpen && (
   <div className="fixed inset-0  backdrop-blur-sm flex items-center justify-center z-50">
     <div className="bg-white rounded-2xl shadow-xl w-[90%] max-w-sm p-6 border border-[#A68F7B] animate-fade-in-up">
