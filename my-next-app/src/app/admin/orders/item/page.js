@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from "next/navigation";
 import axios from 'axios';
-import OrdersHistory from '@/app/itemuser';
+import OrdersHistory from '@/app/Components/itemuser';
 
 const OrderItemsPage = () => {
     const searchParams = useSearchParams();
@@ -43,7 +43,7 @@ const OrderItemsPage = () => {
     
         const getProducts = async () => {
           try {
-            const response = await axios.get("${process.env.NEXT_PUBLIC_API_URL}/products");
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`);
             if (response.status === 200) {
               const productsMap = response.data.reduce((acc, product) => {
                 acc[product.id] = product;

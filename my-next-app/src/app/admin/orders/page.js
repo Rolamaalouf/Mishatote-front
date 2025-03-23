@@ -13,7 +13,7 @@ const Orders = () => {
 
     const getOrders = async () => {
         try {
-            const response = await axios.get("${process.env.NEXT_PUBLIC_API_URL}/orders/", {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
                 withCredentials: true, // Ensure cookies are sent with the request
             });
 
