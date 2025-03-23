@@ -2,18 +2,25 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext"; // Import auth hook
 import Link from "next/link";
 import ImageComponent from "./imageComponent";
-import CartButton from "../Components/CartButton";
+import { ShoppingCart } from "lucide-react"
+import PopupCart from "./PopupCart"
+import { useCart } from "../../context/CartContext"
 
 
 const Header = () => {
   const { user, logout } = useAuth(); // Get user and logout function
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   //const [isCartOpen, setIsCartOpen] = useState(false); // State for cart popup
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const { cartCount, loading } = useCart();
+
 
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   //const toggleCart = () => setIsCartOpen(!isCartOpen); // Toggle cart visibility
-
+  if (loading) {
+    return <div>Loading...</div>; // You can add a loading spinner or something similar
+  }
 
   return (
     <header className="top-0 z-50 w-full flex justify-between items-center px-4 md:px-10 py-4 md:py-6 bg-white shadow-md fixed ">
@@ -95,9 +102,26 @@ const Header = () => {
             height={25} 
           />
         </Link>
-      </div>
-    </header>
-  );
-};
+             {/* Cart Button */}
+       <div className="flex items-center space-x-4">
+       <button
+         onClick={() => setIsCartOpen(true)}
+         className="relative p-2 text-gray-700 hover:text-[#4A8C8C] transition-colors"
+         aria-label="Open cart"
+       >
+         <ShoppingCart size={24} />
+         {cartCount > 0 && (
+           <span className="absolute -top-1 -right-1 bg-[#4A8C8C] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+             {cartCount}
+           </span>
+         )}
+       </button>
+     </div>
+   </div>
 
+   {/* Popup Cart */}
+   <PopupCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+ </header>
+);
+};
 export default Header;
