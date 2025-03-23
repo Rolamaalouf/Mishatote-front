@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from "next/navigation";
 import axios from 'axios';
-import OrdersHistory from '@/app/Components/itemuser';
+import OrdersHistory from '@/app/itemuser';
 
 const OrderItemsPage = () => {
     const searchParams = useSearchParams();
