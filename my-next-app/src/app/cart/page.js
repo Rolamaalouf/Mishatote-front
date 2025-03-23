@@ -3,10 +3,13 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import Link from "next/link"
-import { Minus, Plus, X, ArrowLeft } from "lucide-react"
+import { Minus, Plus, X, ArrowLeft, Trash2 } from "lucide-react"
 import Header from "@/app/Components/header"
+import ContinueShopping from "@/app/Components/ContinueShopping";
+import { useAuth } from "@/context/AuthContext" // Import auth context
 
 export default function CartPage() {
+  const { user } = useAuth() // Get user from context
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -14,6 +17,11 @@ export default function CartPage() {
 // Fetch cart items with product details
 useEffect(() => {
   const fetchCart = async () => {
+     // Ensure user exists before fetching
+      if (!user) {
+        setLoading(false)
+        return
+      }
     try {
       setLoading(true)
       console.log("Fetching cart from:", `${process.env.NEXT_PUBLIC_API_URL}/cart`)
@@ -58,7 +66,7 @@ useEffect(() => {
   }
 
   fetchCart()
-}, [])
+}, [user])// Refetch when user changes
 
   // Update quantity
   const updateQuantity = async (productId, newQuantity) => {
@@ -136,30 +144,41 @@ useEffect(() => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 -mt-10">
         {/* Back Button */}
-        <Link href="/" className="inline-flex items-center text-gray-600 mb-6 bg-white px-4 py-2 rounded-lg shadow-sm">
+        <div className="inline-flex items-center text-gray-600 mb-6 bg-white px-4 py-2 rounded-lg shadow-sm">
           <ArrowLeft size={16} className="mr-2" />
-          <span>Continue Shopping</span>
-        </Link>
+          <ContinueShopping />
+        </div>
 
         {/* Cart Content */}
         <div className="grid md:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="md:col-span-2 bg-white rounded-lg p-6 shadow-lg">
-            {loading ? (
-              <p className="text-center py-8">Loading your cart...</p>
+          {loading ? (
+             <p className="text-center py-8">Loading your cart...</p>
+          ) : !user ? (
+            <div className="text-center py-8">
+              <p className="mb-4 text-lg">Please log in to view your cart</p>
+              <Link href="/login" className="text-[#4A8C8C] hover:underline font-medium">
+                Log in
+              </Link>
+            </div>
             ) : error ? (
               <p className="text-center text-red-500 py-8">{error}</p>
             ) : displayItems.length === 0 ? (
               <div className="text-center py-8">
                 <p className="mb-4 text-lg">Your cart is empty</p>
-                <Link href="/products" className="text-[#4A8C8C] hover:underline font-medium">
-                  Continue shopping
+                <Link href="/totes">
+                <button className="text-[#4A8C8C] hover:underline font-medium">
+                Continue shopping
+                </button>
                 </Link>
               </div>
             ) : (
               <div className="space-y-6">
+                
                 {displayItems.map((item) => (
                   <div key={item.product_id} className="flex items-center border-b pb-6">
+                    
                     <div className="ml-4 flex-grow">
                       <div className="flex justify-between">
                         <div>
