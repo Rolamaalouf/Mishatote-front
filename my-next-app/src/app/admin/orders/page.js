@@ -13,7 +13,7 @@ const Orders = () => {
 
     const getOrders = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/orders/", {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
                 withCredentials: true, // Ensure cookies are sent with the request
             });
 
@@ -30,7 +30,7 @@ const Orders = () => {
 
     const deleteOrder = async (orderId) => {
         try {
-            const response = await axios.delete(`http://localhost:5000/api/orders/${orderId}`, {
+            const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`, {
                 withCredentials: true, // Ensure cookies are sent with the request
             });
 

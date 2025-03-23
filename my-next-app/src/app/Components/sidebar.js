@@ -5,10 +5,13 @@ import ImageComponent from "./imageComponent";
 import Link from "next/link";
 import { FaHome, FaUsers, FaShoppingCart, FaClipboardList, FaTachometerAlt } from "react-icons/fa";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
+import { useAuth } from "@/context/AuthContext";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false); // Controls mobile menu
+  const { user, loading } = useAuth(); 
 
+  if (loading) return null;
   return (
     <div className="flex">  
       {/* Sidebar */}

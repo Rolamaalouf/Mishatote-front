@@ -12,7 +12,7 @@ const OrdersHistory = ({ user }) => {
   // Fetch orders
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/orders/my-orders", {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders/my-orders`, {
         withCredentials: true,
       });
       console.log("Orders Response:", response.data);
@@ -26,7 +26,7 @@ const OrdersHistory = ({ user }) => {
   // Fetch products
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/products");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`);
       if (response.status === 200) {
         const productsMap = response.data.reduce((acc, product) => {
           acc[product.id] = product;

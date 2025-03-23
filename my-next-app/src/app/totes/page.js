@@ -5,105 +5,183 @@ import Header from "@/app/Components/header";
 import Footer from "@/app/Components/footer";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaShoppingCart } from "react-icons/fa";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [cartItems, setCartItems] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sortOrder, setSortOrder] = useState("lowToHigh");
 
-  // Fetch products on load
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const categoryFromURL = searchParams.get("category");
+  const modalProductId = searchParams.get("modal");
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
-          withCredentials: true,
-        });
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
-
-  // Fetch cart items on load
-  useEffect(() => {
-    fetchCartItems();
-  }, []);
-
-  const fetchCartItems = async () => {
+    if (categoryFromURL) {
+      setSelectedCategory(categoryFromURL);
+      
+    }
+  }, [categoryFromURL]);
+ 
+useEffect(() => {
+  const fetchProducts = async () => {
     try {
-      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
-        withCredentials: true,
-      });
-      setCartItems(data);
+      let url = `${process.env.NEXT_PUBLIC_API_URL}/products`;
+      const { data } = await axios.get(url, { withCredentials: true });
+
+      const filtered = selectedCategory === "all"
+        ? data
+        : data.filter((product) => product.category_id === parseInt(selectedCategory));
+
+      setProducts(filtered);
     } catch (error) {
-      console.error("Fetch Cart Error:", error);
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
     }
   };
+  fetchProducts();
+}, [selectedCategory, categoryFromURL]);
+ 
+useEffect(() => {
+  if (modalProductId && products.length > 0) {
+    const selected = products.find((p) => p.id === parseInt(modalProductId));
+    if (selected) {
+      setSelectedProduct(selected);
+      const params = new URLSearchParams(window.location.search);
+      params.delete("modal");
+      const newPath = `${window.location.pathname}?${params.toString()}`;
+      router.replace(newPath);
+    }
+  }
+}, [modalProductId, products]);
 
-  // Open Popup and Reset Quantity
+
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
+          withCredentials: true,
+        });
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+          withCredentials: true,
+        });
+        setIsAuthenticated(true);
+      } catch {
+        setIsAuthenticated(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
   const openCartPopup = (product) => {
+    if (!isAuthenticated) {
+      toast.error("Log in first to add items to the cart!");
+      setTimeout(() => router.push("/login"), 2000);
+      return;
+    }
     setSelectedProduct(product);
     setQuantity(1);
   };
 
-  // Handle Add to Cart
   const handleAddToCart = async () => {
     if (!selectedProduct) return;
 
     try {
-      const { data } = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/cart/add`,
         { product_id: selectedProduct.id, quantity },
         { withCredentials: true }
       );
 
       toast.success(`Added ${quantity} item(s) to cart!`);
-      fetchCartItems(); // Update cart in real-time
-      setSelectedProduct(null); // Close popup
+      setSelectedProduct(null);
     } catch (error) {
       console.error("Add to Cart Error:", error);
       toast.error("Failed to add item to cart!");
     }
   };
 
+  const sortedProducts = [...products].sort((a, b) =>
+    sortOrder === "lowToHigh" ? a.price - b.price : b.price - a.price
+  );
+
   return (
-    <div className="relative w-full min-h-screen">
+    <div className="relative w-full min-h-screen mt-20 px-6 py-12">
       <Head>
         <title>Products</title>
       </Head>
 
       <Header />
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+      <ToastContainer position="top-center" autoClose={3000} />
 
-      <div className="relative w-full bg-[#4A8C8C] h-[10cm] flex items-center justify-center">
-        <h1 className="text-white text-4xl font-bold absolute bottom-40">Products</h1>
+      <div className="relative w-full h-[7cm] flex flex-col items-center justify-end bg-[#A68F7B]">
+        <h1 className="text-white text-4xl font-bold mb-5">Products</h1>
+        <img
+          src="https://i.ibb.co/6JYgYPSH/Whats-App-Image-2025-03-22-at-10-02-39-AM.jpg"
+          alt="Products"
+          className="w-[1000px] h-[400px] object-contain mb-[-6cm]"
+        />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-10 mt-50">
+      <div className="flex justify-center gap-4 my-6 mt-70">
+        <select
+          className="p-2 border rounded"
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          value={selectedCategory}
+        >
+          <option value="all">All Categories</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="p-2 border rounded"
+          onChange={(e) => setSortOrder(e.target.value)}
+        >
+          <option value="lowToHigh">Price: Low to High</option>
+          <option value="highToLow">Price: High to Low</option>
+        </select>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-10">
         {loading ? (
           <p>Loading products...</p>
-        ) : (
-          products.map((product) => (
-            <div key={product.id} className="border p-4 rounded-lg shadow-lg text-center relative">
+        ) : sortedProducts.length > 0 ? (
+          sortedProducts.map((product) => (
+            <div key={product.id} className="p-4 shadow-lg text-center">
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-[200px] object-cover mb-2 border-2 border-[#A68F7B] rounded"
-                onError={(e) => (e.target.src = "/placeholder.jpg")}
+                className="w-full h-[200px] object-cover mb-2 rounded"
+                onClick={() => router.push(`/totes?modal=${product.id}`)}
               />
-
               <h3 className="text-lg font-bold">{product.name}</h3>
               <p className="text-gray-600">${product.price}</p>
-
               <button
                 className="mt-4 bg-[#4A8C8C] text-white px-6 py-2 rounded w-full"
                 onClick={() => openCartPopup(product)}
@@ -112,23 +190,23 @@ export default function Products() {
               </button>
             </div>
           ))
+        ) : (
+          <p className="col-span-full text-center">No products found in this category</p>
         )}
       </div>
 
-      {/* Popup Modal for Quantity Selection */}
       {selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0  backdrop-blur-sm bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
             <h2 className="text-xl font-bold">{selectedProduct.name}</h2>
             <img
               src={selectedProduct.image}
               alt={selectedProduct.name}
-              className="w-full h-[200px] object-cover border-2 border-[#A68F7B] rounded my-2"
+              className="w-full h-[200px] object-cover rounded my-2"
             />
             <p className="text-gray-700">{selectedProduct.description}</p>
             <p className="text-gray-600">${selectedProduct.price}</p>
 
-            {/* Quantity Controls */}
             <div className="flex items-center justify-center my-4">
               <button
                 className="bg-gray-300 px-4 py-2 rounded-l"
@@ -145,15 +223,12 @@ export default function Products() {
               </button>
             </div>
 
-            {/* Add to Cart Button */}
             <button
               className="mt-4 bg-[#4A8C8C] text-white px-6 py-2 rounded w-full"
               onClick={handleAddToCart}
             >
               Confirm
             </button>
-
-            {/* Close Button */}
             <button
               className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
               onClick={() => setSelectedProduct(null)}

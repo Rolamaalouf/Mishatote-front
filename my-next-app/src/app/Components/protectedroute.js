@@ -2,19 +2,28 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const ProtectAdminRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (!user || user.role !== "admin") {
-      router.push("/login"); // Redirect non-admins
+    if (!loading) {
+      if (!user || user.role !== "admin") {
+        router.replace("/login?redirect=/admin");  
+      } else {
+        setChecked(true);  
+      }
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
-  return user?.role === "admin" ? children : null;
+  if (loading || !checked) {
+    return <div className="text-center py-10">Verifying access...</div>;
+  }
+
+  return children;
 };
 
 export default ProtectAdminRoute;
