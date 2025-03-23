@@ -3,6 +3,8 @@
 import "@/styles/globals.css";
 import { Belleza } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext"; // Ensure correct path
+//import { CartProvider } from "../context/CartContext";
+//import PopupCart from "../Components/PopupCart";
 
 const belleza = Belleza({ subsets: ["latin"], weight: "400" });
 

@@ -2,43 +2,63 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, X, ArrowLeft, Tag } from "lucide-react"
+import { Minus, Plus, X, ArrowLeft } from "lucide-react"
 import Header from "@/app/Components/header"
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [promoCode, setPromoCode] = useState("")
-  const [discount, setDiscount] = useState(0)
 
-  // Fetch cart items
-  useEffect(() => {
-    const fetchCart = async () => {
-      console.log("API URL:", process.env.NEXT_PUBLIC_API_URL); // Debugging line
-      try {
-        setLoading(true)
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
-          withCredentials: true, // Enable credentials
-        })
+// Fetch cart items with product details
+useEffect(() => {
+  const fetchCart = async () => {
+    try {
+      setLoading(true)
+      console.log("Fetching cart from:", `${process.env.NEXT_PUBLIC_API_URL}/cart`)
 
-        // Assuming the backend returns cart items with product details
-        setCartItems(response.data)
+      // First, get the basic cart items
+      const cartResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+        withCredentials: true,
+      })
 
-        // For demo purposes, set a discount
-        setDiscount(20) // 20% discount
-      } catch (err) {
-        console.error("Error fetching cart:", err)
-        setError("Failed to load cart items")
-      } finally {
-        setLoading(false)
-      }
+      // Then, for each cart item, get the product details
+      const cartItemsWithProducts = await Promise.all(
+        cartResponse.data.map(async (item) => {
+          try {
+            const productResponse = await axios.get(
+              `${process.env.NEXT_PUBLIC_API_URL}/products/${item.product_id}`,
+              { withCredentials: true },
+            )
+            return {
+              ...item,
+              Product: productResponse.data,
+              subtotal: productResponse.data.price * item.quantity,
+            }
+          } catch (err) {
+            console.error(`Error fetching product ${item.product_id}:`, err)
+            return {
+              ...item,
+              Product: null,
+              subtotal: 0,
+            }
+          }
+        }),
+      )
+
+      console.log("Cart items with products:", cartItemsWithProducts)
+      setCartItems(cartItemsWithProducts || [])
+    } catch (err) {
+      console.error("Error fetching cart:", err)
+      setError("Failed to load cart items. Please try again later.")
+    } finally {
+      setLoading(false)
     }
+  }
 
-    fetchCart()
-  }, [])
+  fetchCart()
+}, [])
 
   // Update quantity
   const updateQuantity = async (productId, newQuantity) => {
@@ -50,26 +70,29 @@ export default function CartPage() {
         prevItems.map((item) => (item.product_id === productId ? { ...item, quantity: newQuantity } : item)),
       )
 
-      // Then update on server using axios
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/cart`,
-        {
-          product_id: productId,
-          quantity: newQuantity - cartItems.find((item) => item.product_id === productId)?.quantity,
-        },
-        {
-          withCredentials: true, // Enable credentials
-        },
-      )
-    } catch (err) {
-      console.error("Error updating quantity:", err)
-      // Revert on failure
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
-        withCredentials: true, // Enable credentials
+    // Then update on server
+    await axios.put(
+      `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
+      {
+        quantity: newQuantity,
+      },
+      {
+        withCredentials: true,
+      },
+    )
+  } catch (err) {
+    console.error("Error updating quantity:", err)
+    // Revert on failure by refetching
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart/with-products`, {
+        withCredentials: true,
       })
-      setCartItems(response.data)
+      setCartItems(response.data.items || [])
+    } catch (fetchErr) {
+      console.error("Error refetching cart:", fetchErr)
     }
   }
+}
 
   // Remove from cart
   const removeFromCart = async (productId) => {
@@ -85,98 +108,20 @@ export default function CartPage() {
     }
   }
 
-  // Apply promo code
-  const applyPromoCode = () => {
-    // This would typically validate with the backend
-    // For demo purposes, we'll just show an alert
-    alert(`Promo code "${promoCode}" applied!`)
+  // Calculate totals dynamically (based on the prices of products)
+  const subtotal = cartItems.reduce((sum, item) => {
+    const price = item.Product?.price || 0;
+    return sum + (price * item.quantity);
+  }, 0);
+
+   // Format price to 2 decimal places
+   const formatPrice = (price) => {
+    return (Math.round(price * 100) / 100).toFixed(2)
   }
 
-  // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
-  const discountAmount = (subtotal * discount) / 100
-  const deliveryFee = 3
-  const total = subtotal - discountAmount + deliveryFee
-
-  // Mock data for demonstration
-  const mockCartItems = [
-    {
-      id: 1,
-      product_id: 1,
-      user_id: 1,
-      quantity: 2,
-      product: {
-        id: 1,
-        name: "tote",
-        price: 10,
-        image: "/placeholder.svg?height=100&width=100",
-        size: "Large",
-        color: "black",
-      },
-    },
-    {
-      id: 2,
-      product_id: 2,
-      user_id: 1,
-      quantity: 1,
-      product: {
-        id: 2,
-        name: "tote",
-        price: 10,
-        image: "/placeholder.svg?height=100&width=100",
-        size: "Medium",
-        color: "white",
-      },
-    },
-    {
-      id: 3,
-      product_id: 3,
-      user_id: 1,
-      quantity: 1,
-      product: {
-        id: 3,
-        name: "tote",
-        price: 10,
-        image: "/placeholder.svg?height=100&width=100",
-        size: "Large",
-        color: "beige",
-      },
-    },
-    {
-      id: 4,
-      product_id: 4,
-      user_id: 1,
-      quantity: 1,
-      product: {
-        id: 4,
-        name: "tote",
-        price: 10,
-        image: "/placeholder.svg?height=100&width=100",
-        size: "Large",
-        color: "beige",
-      },
-    },
-    {
-      id: 5,
-      product_id: 5,
-      user_id: 1,
-      quantity: 1,
-      product: {
-        id: 5,
-        name: "Skinny Fit Jeans",
-        price: 10,
-        image: "/placeholder.svg?height=100&width=100",
-        size: "Large",
-        color: "beige",
-      },
-    },
-  ]
-
-  // Use mock data for demonstration
-  const displayItems = cartItems.length > 0 ? cartItems : mockCartItems
-  const displaySubtotal = subtotal > 0 ? subtotal : 50
-  const displayDiscount = discountAmount > 0 ? discountAmount : 10
-  const displayTotal = total > 0 ? total : 43
+  const displayItems = cartItems;
+  const displaySubtotal = subtotal;
+  const displayTotal = displaySubtotal;// No delivery fee added here as per the previous change
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -196,31 +141,6 @@ export default function CartPage() {
           <span>Continue Shopping</span>
         </Link>
 
-        {/* Checkout Progress */}
-        <div className="mb-10 mt-6">
-          <div className="flex justify-between items-center relative">
-            <div className="flex flex-col items-center">
-              <div className="w-6 h-6 rounded-full bg-[#4A8C8C] flex items-center justify-center">
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-              </div>
-              <span className="text-sm mt-1 text-[#4A8C8C] font-medium">Cart</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center">
-                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-              </div>
-              <span className="text-sm mt-1 text-gray-500">Checkout</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center">
-                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-              </div>
-              <span className="text-sm mt-1 text-gray-500">Confirmation</span>
-            </div>
-            <div className="absolute top-3 left-0 right-0 h-[1px] bg-gray-200 -z-10"></div>
-          </div>
-        </div>
-
         {/* Cart Content */}
         <div className="grid md:grid-cols-3 gap-8">
           {/* Cart Items */}
@@ -239,22 +159,13 @@ export default function CartPage() {
             ) : (
               <div className="space-y-6">
                 {displayItems.map((item) => (
-                  <div key={item.id} className="flex items-center border-b pb-6">
-                    <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
-                      <Image
-                        src={item.product.image || "/placeholder.svg"}
-                        alt={item.product.name}
-                        width={80}
-                        height={80}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                  <div key={item.product_id} className="flex items-center border-b pb-6">
                     <div className="ml-4 flex-grow">
                       <div className="flex justify-between">
                         <div>
-                          <h3 className="text-gray-700 font-medium">{item.product.name}</h3>
-                          <p className="text-gray-500 text-sm">Size: {item.product.size}</p>
-                          <p className="text-gray-500 text-sm">Color: {item.product.color}</p>
+                          <h3 className="text-gray-700 font-medium">
+                            {item.Product?.name || "Product name unavailable"}
+                          </h3>
                         </div>
                         <button
                           onClick={() => removeFromCart(item.product_id)}
@@ -279,7 +190,9 @@ export default function CartPage() {
                             <Plus size={16} />
                           </button>
                         </div>
-                        <span className="font-medium">${item.product.price}</span>
+                        <span className="font-medium">
+                          ${item.Product?.price || "0.00"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -297,14 +210,6 @@ export default function CartPage() {
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-medium">${displaySubtotal}</span>
                 </div>
-                <div className="flex justify-between text-red-500">
-                  <span>Discount ({discount}%)</span>
-                  <span>-${displayDiscount}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Delivery Fee</span>
-                  <span className="font-medium">${deliveryFee}</span>
-                </div>
                 <div className="border-t pt-4 mt-4">
                   <div className="flex justify-between font-bold text-xl">
                     <span>Total</span>
@@ -312,30 +217,12 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                {/* Promo Code */}
-                <div className="mt-6 flex items-center">
-                  <div className="flex items-center border rounded-l-md px-3 py-2 bg-gray-50 flex-grow">
-                    <Tag size={16} className="text-gray-400 mr-2" />
-                    <input
-                      type="text"
-                      placeholder="Add promo code"
-                      className="bg-transparent outline-none w-full"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
-                    />
-                  </div>
-                  <button
-                    onClick={applyPromoCode}
-                    className="bg-white border border-l-0 rounded-r-md px-4 py-2 text-gray-700 hover:bg-gray-50"
-                  >
-                    Apply
-                  </button>
-                </div>
-
                 {/* Checkout Button */}
+                <Link href='/checkout'>
                 <button className="w-full bg-[#4A8C8C] text-white py-3 rounded-md hover:bg-[#3a7070] transition mt-6 font-medium text-lg">
                   Checkout
                 </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -344,4 +231,3 @@ export default function CartPage() {
     </div>
   )
 }
-

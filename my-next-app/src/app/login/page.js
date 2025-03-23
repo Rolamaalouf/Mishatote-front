@@ -17,22 +17,26 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const userData = await login({ email, password });
-
+  
       if (userData) {
-        toast.success('Login successful');
-
-        // Check if the user has the "admin" role
+        toast.success("Login successful");
+  
+        // ✅ Store role in localStorage for access control
+        localStorage.setItem("role", userData.role);
+  
+        // Redirect based on role
         if (userData.role === "admin") {
-          router.push("/admin"); // Redirect admins to dashboardProduct
+          router.push("/admin"); // Redirect admins to the admin panel
         } else {
           router.push("/"); // Redirect non-admins to home page
         }
       }
     } catch (err) {
-      toast.error('Invalid email or password');
+      toast.error("Invalid email or password");
       setError("Login failed. Please check your credentials and try again.");
     }
   };
+  
 
   return (
     <div className="flex h-screen">

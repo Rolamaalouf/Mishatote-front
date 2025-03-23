@@ -2,12 +2,18 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext"; // Import auth hook
 import Link from "next/link";
 import ImageComponent from "./imageComponent";
+import CartButton from "../Components/CartButton";
+
 
 const Header = () => {
   const { user, logout } = useAuth(); // Get user and logout function
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  //const [isCartOpen, setIsCartOpen] = useState(false); // State for cart popup
+
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  //const toggleCart = () => setIsCartOpen(!isCartOpen); // Toggle cart visibility
+
 
   return (
     <header className="top-0 z-50 w-full flex justify-between items-center px-4 md:px-10 py-4 md:py-6 bg-white shadow-md fixed ">
@@ -80,6 +86,7 @@ const Header = () => {
             height={25} 
           />
         </Link>
+
         <Link href="/cart">
           <ImageComponent 
             src="https://i.ibb.co/3mt2BFXt/Cart.png" 
