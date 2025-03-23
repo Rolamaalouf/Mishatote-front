@@ -7,6 +7,10 @@ import Footer from "@/app/Components/footer";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast,ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { FiShoppingBag } from "react-icons/fi";
+
 
 export default function Home() {
   const { user } = useAuth();
@@ -49,8 +53,19 @@ export default function Home() {
   };
 
   const handleProductClick = (productId) => {
+    if (!user) {
+      toast.error("Please log in before adding to your cart!");
+      
+      setTimeout(() => {
+        router.push("/login");
+      }, 2500);
+  
+      return;
+    }
+  
     router.push(`/totes?modal=${productId}`);
   };
+  
 
   const latestProducts = [...products].slice(-4).reverse();
 
@@ -123,8 +138,11 @@ export default function Home() {
 </div>
 
 {/* Latest Products */}
-<h2 className="text-3xl font-bold text-center mt-20 mb-6">Newest</h2>
-<div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-6">
+<h2 className="text-3xl font-bold text-center mt-20 mb-6 flex items-center justify-center gap-2">
+  Fresh Finds - Click to Add
+  <FiShoppingBag className="text-[#A68F7B]" />
+
+</h2><div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-6">
   {latestProducts.map((product) => {
     const imageUrl = parseProductImage(product.image);
     return (
@@ -151,6 +169,7 @@ export default function Home() {
   </div>
 )}
 
+<ToastContainer position="top-center" autoClose={3000} />
 
       <Footer />
     </div>

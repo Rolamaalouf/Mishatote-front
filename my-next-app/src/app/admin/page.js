@@ -28,21 +28,25 @@ const DashboardPage = () => {
   }, [user]);
 
   const fetchOrders = async () => {
-      try {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
-              withCredentials: true,
-          });
-          const allOrders = response.data;
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
+            withCredentials: true,
+        });
 
-          const orderYears = allOrders.map(order => new Date(order.createdAt).getFullYear());
-          const uniqueYears = ["all", ...new Set(orderYears.sort((a, b) => b - a))];
-          setYears(uniqueYears);
+        const allOrders = response.data;
+ 
+        const deliveredOrders = allOrders.filter(order => order.status === 'delivered');
+ 
+        const orderYears = deliveredOrders.map(order => new Date(order.createdAt).getFullYear());
+        const uniqueYears = ["all", ...new Set(orderYears.sort((a, b) => b - a))];
 
-          setOrders(allOrders);
-      } catch (error) {
-          console.error("Error fetching orders:", error);
-      }
-  };
+        setYears(uniqueYears);
+        setOrders(deliveredOrders);
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+    }
+};
+
 
   useEffect(() => {
       fetchBestSellers();
@@ -185,22 +189,24 @@ const DashboardPage = () => {
           </div>
 
           {/* Top Best-Selling Products */}
-          <div className="shadow-lg p-6 bg-white">
-              <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
-                  <FaBoxOpen className="text-yellow-500" /> Top Best-Selling Products
-              </h2>
-              <ul className="list-disc pl-6 text-lg text-gray-700">
-                  {topProducts.length > 0 ? (
-                      topProducts.map((product, index) => (
-                          <li key={index} className="py-1">
-                              <span className="font-bold">{product.product_name}</span> - {product.totalSales} sold
-                          </li>
-                      ))
-                  ) : (
-                      <li className="text-gray-500">No data available</li>  
-                  )}
-              </ul>
-          </div>
+        <div className="bg-white rounded-xl shadow-xl p-6 md:p-8 space-y-4">
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                <FaBoxOpen className="text-yellow-500 text-3xl" />
+                Top Best-Selling Products
+            </h2>
+
+            <ul className="space-y-3 text-base md:text-lg text-gray-700">
+                {topProducts.length > 0 ? (
+                topProducts.map((product, index) => (
+                    <li key={index} className="leading-relaxed">
+                    <span className="font-semibold text-[#4A8C8C]">{product.product_name}</span> has been sold <span className="font-bold">{product.totalSales}</span> time. You currently have <span className="font-bold">{product.stock}</span> in stock.
+                    </li>
+                ))
+                ) : (
+                <li className="text-gray-500 italic">No best-selling data available.</li>
+                )}
+            </ul>
+        </div>
       </div>
   );
 };
