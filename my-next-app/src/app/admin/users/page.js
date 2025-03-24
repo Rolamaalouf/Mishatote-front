@@ -5,6 +5,8 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { AuthProvider } from "@/context/AuthContext";
 import { FiTrash } from "react-icons/fi";
+import { validateAddress } from "@/app/Components/checkout/utils/validation"; // Import validation utility
+import AddressForm from "@/app/Components/checkout/AddressForm"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -16,7 +18,13 @@ const UsersPage = () => {
     name: "",
     email: "",
     password: "",
-    address: "",
+    address: {
+      region: "",
+      "address-direction": "",
+      phone: "",
+      building: "",
+      floor: "",
+    },
     role: "customer",
   });
   const [loading, setLoading] = useState(false);
@@ -31,7 +39,6 @@ const UsersPage = () => {
     filterUsers();
   }, [roleFilter, users]);
 
-  // ✅ Check admin status from localStorage
   const checkAdminStatus = () => {
     const storedRole = localStorage.getItem("role");
 
@@ -40,22 +47,7 @@ const UsersPage = () => {
       fetchUsers();
     } else {
       setIsAdmin(false);
-      toast.error("Access denied. Admins only.", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        style: {
-          backgroundColor: "#e74c3c",
-          color: "#ecf0f1",
-          borderRadius: "8px",
-          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-        },
-      });
+      toast.error("Access denied. Admins only.");
       setTimeout(() => {
         if (!isAdmin) {
           window.location.href = "/";
@@ -64,227 +56,78 @@ const UsersPage = () => {
     }
   };
 
-  // ✅ Fetch users from API
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/users`, {
-        withCredentials: true,
-      });
+      const res = await axios.get(`${API_URL}/users`, { withCredentials: true });
       setUsers(res.data.users || []);
     } catch (error) {
-      console.error(
-        "Error fetching users:",
-        error.response?.data || error.message
-      );
-      toast.error(
-        error.response?.data?.message || "Error fetching users.", {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          style: {
-            backgroundColor: "#e74c3c",
-            color: "#ecf0f1",
-            borderRadius: "8px",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-          },
-        }
-      );
+      toast.error("Error fetching users.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Filter users by role
   const filterUsers = () => {
-    setFilteredUsers(
-      users.filter((user) => roleFilter === "all" || user.role === roleFilter)
-    );
+    setFilteredUsers(users.filter((user) => roleFilter === "all" || user.role === roleFilter));
   };
 
-  // ✅ Handle new user registration
   const handleAddUser = async (e) => {
     e.preventDefault();
     setFormErrors({});
 
-    try {
-      await axios.post(
-        `${API_URL}/users/register`,
-        { ...newUser },
-        { withCredentials: true }
-      );
+    // Validate address before submission
+    if (!validateAddress(newUser.address)) {
+      return; // Prevent form submission if validation fails
+    }
 
+    try {
+      await axios.post(`${API_URL}/users/register`, newUser, { withCredentials: true });
       fetchUsers();
       setNewUser({
         name: "",
         email: "",
         password: "",
-        address: "",
+        address: {
+          region: "",
+          "address-direction": "",
+          phone: "",
+          building: "",
+          floor: "",
+        },
         role: "customer",
       });
-      toast.success("User added successfully!", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        style: {
-          backgroundColor: "#2c3e50",
-          color: "#ecf0f1",
-          borderRadius: "8px",
-          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-        },
-      });
+      toast.success("User added successfully!");
     } catch (error) {
-      if (error.response) {
-        const data = error.response.data;
-        console.error("API Error:", data);
-
-        if (data?.errors) {
-          setFormErrors(data.errors);
-        } else if (data?.message) {
-          toast.error(data.message, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            style: {
-              backgroundColor: "#e74c3c",
-              color: "#ecf0f1",
-              borderRadius: "8px",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-            },
-          });
-        } else {
-          toast.error("Unknown API error. Please try again.", {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            style: {
-              backgroundColor: "#e74c3c",
-              color: "#ecf0f1",
-              borderRadius: "8px",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-            },
-          });
-        }
-      } else {
-        console.error("Network Error:", error.message);
-        toast.error("Network error. Please check your connection.", {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          style: {
-            backgroundColor: "#e74c3c",
-            color: "#ecf0f1",
-            borderRadius: "8px",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-          },
-        });
-      }
+      toast.error("Failed to add user.");
     }
   };
 
-  // ✅ Handle User Deletion
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`${API_URL}/users/${userId}`, {
-        withCredentials: true,
-      });
-
-      // Update the state immediately
-      setUsers((prevUsers) =>
-        prevUsers.filter((user) => user.id !== userId)
-      );
-      setFilteredUsers((prevUsers) =>
-        prevUsers.filter((user) => user.id !== userId)
-      );
-
-      toast.success("User deleted successfully!", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        style: {
-          backgroundColor: "#2c3e50",
-          color: "#ecf0f1",
-          borderRadius: "8px",
-          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-        },
-      });
-
-      // Optionally fetch the latest users
-      fetchUsers();
+      await axios.delete(`${API_URL}/users/${userId}`, { withCredentials: true });
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+      setFilteredUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+      toast.success("User deleted successfully!");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete user", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        style: {
-          backgroundColor: "#e74c3c",
-          color: "#ecf0f1",
-          borderRadius: "8px",
-          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-        },
-      });
+      toast.error("Failed to delete user.");
     }
   };
 
   return (
     <AuthProvider>
-      <div className="p-4">
-        <ToastContainer
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-        <h1 className="text-2xl font-bold">Manage Users</h1>
+      <div className="p-4 max-w-4xl mx-auto">
+        <ToastContainer />
+        <h1 className="text-2xl font-bold text-center">Manage Users</h1>
 
         {isAdmin ? (
           <>
-            <div className="my-4">
-              <label>Filter by role:</label>
+            {/* Role Filter */}
+            <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
+              <label className="text-lg font-medium">Filter by role:</label>
               <select
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="ml-2 p-1 border"
+                className="p-2 border rounded-md w-full sm:w-auto"
               >
                 <option value="all">All</option>
                 <option value="admin">Admin</option>
@@ -292,168 +135,105 @@ const UsersPage = () => {
               </select>
             </div>
 
+            {/* Users Table */}
             {loading ? (
-              <div>Loading users...</div>
+              <div className="text-center">Loading users...</div>
             ) : (
-              <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-200" style={{ backgroundColor: "#4A8C8C", color: "white" }}>
-                    <th className="border p-2">ID</th>
-                    <th className="border p-2">Name</th>
-                    <th className="border p-2">Email</th>
-                    <th className="border p-2">Role</th>
-                    <th className="border p-2">Address</th>
-                    <th className="border p-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" className="text-center p-2">
-                        No users found
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full border border-gray-300 text-sm sm:text-base">
+                  <thead>
+                    <tr className="bg-[#4A8C8C] text-white">
+                      <th className="border p-2">ID</th>
+                      <th className="border p-2">Name</th>
+                      <th className="border p-2">Email</th>
+                      <th className="border p-2">Role</th>
+                      <th className="border p-2">Address</th>
+                      <th className="border p-2">Actions</th>
                     </tr>
-                  ) : (
-                    filteredUsers.map((user) => (
-                      <tr key={user.id}>
-                        <td className="border p-2">{user.id}</td>
-                        <td className="border p-2">{user.name}</td>
-                        <td className="border p-2">{user.email}</td>
-                        <td className="border p-2">{user.role}</td>
-                        <td className="border p-2">
-                          {user.address && typeof user.address === "object"
-                            ? `${user.address.region}, ${user.address.building}`
-                            : user.address || "N/A"}
-                        </td>
-                        <td className="border p-2 text-center">
-                          <button
-                            onClick={() => handleDeleteUser(user.id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <FiTrash className="inline-block h-5 w-5" aria-label="Delete" />
-                          </button>
+                  </thead>
+                  <tbody>
+                    {filteredUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="text-center p-2">
+                          No users found
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      filteredUsers.map((user) => (
+                        <tr key={user.id} className="text-center">
+                          <td className="border p-2">{user.id}</td>
+                          <td className="border p-2">{user.name}</td>
+                          <td className="border p-2">{user.email}</td>
+                          <td className="border p-2">{user.role}</td>
+                          <td className="border p-2">
+                            {user.address
+                              ? `${user.address.region}, ${user.address["address-direction"]}, ${user.address.building}, ${user.address.floor}, ${user.address.phone}`
+                              : "N/A"}
+                          </td>
+                          <td className="border p-2">
+                            <button onClick={() => handleDeleteUser(user.id)} className="text-red-500">
+                              <FiTrash className="inline-block h-5 w-5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             )}
 
-            <div className="my-4">
-              <h2 className="text-xl font-bold">Add User</h2>
-              <form onSubmit={handleAddUser} className="flex flex-col gap-2">
-                <div className="flex flex-col">
-                  <label className="mb-1">Name</label>
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    value={newUser.name}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, name: e.target.value })
-                    }
-                    required
-                    className={`border p-2 ${
-                      formErrors?.name ? "border-red-500" : ""
-                    }`}
-                  />
-                  {formErrors?.name && (
-                    <div className="text-red-500 mt-1">{formErrors.name}</div>
-                  )}
-                </div>
+            {/* Add User Form */}
+            <div className="my-6 bg-gray-100 p-4 rounded-md">
+              <h2 className="text-xl font-bold mb-2">Add User</h2>
+              <form onSubmit={handleAddUser} className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                  required
+                  className="border p-2 rounded-md"
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  required
+                  className="border p-2 rounded-md"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  required
+                  className="border p-2 rounded-md"
+                />
 
-                <div className="flex flex-col">
-                  <label className="mb-1">Email</label>
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={newUser.email}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, email: e.target.value })
-                    }
-                    required
-                    className={`border p-2 ${
-                      formErrors?.email ? "border-red-500" : ""
-                    }`}
-                  />
-                  {formErrors?.email && (
-                    <div className="text-red-500 mt-1">{formErrors.email}</div>
-                  )}
-                </div>
+                {/* Address Form */}
+                <AddressForm
+                  address={newUser.address}
+                  updateAddress={(updatedAddress) => setNewUser({ ...newUser, address: { ...newUser.address, ...updatedAddress } })}
+                />
 
-                <div className="flex flex-col">
-                  <label className="mb-1">Password</label>
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={newUser.password}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, password: e.target.value })
-                    }
-                    required
-                    className={`border p-2 ${
-                      formErrors?.password ? "border-red-500" : ""
-                    }`}
-                  />
-                  {formErrors?.password && (
-                    <div className="text-red-500 mt-1">
-                      {formErrors.password}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="mb-1">Address</label>
-                  <input
-                    type="text"
-                    placeholder="Address"
-                    value={newUser.address}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, address: e.target.value })
-                    }
-                    required
-                    className={`border p-2 ${
-                      formErrors?.address ? "border-red-500" : ""
-                    }`}
-                  />
-                  {formErrors?.address && (
-                    <div className="text-red-500 mt-1">
-                      {formErrors.address}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="mb-1">Role</label>
-                  <select
-                    value={newUser.role}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, role: e.target.value })
-                    }
-                    className={`border p-2 ${
-                      formErrors?.role ? "border-red-500" : ""
-                    }`}
-                  >
-                    <option value="customer">Customer</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                  {formErrors?.role && (
-                    <div className="text-red-500 mt-1">{formErrors.role}</div>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  className="bg-[#4A8C8C] text-white p-2"
-                  style={{ backgroundColor: "#4A8C8C" }}
+                <select
+                  value={newUser.role}
+                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                  className="border p-2 rounded-md"
                 >
+                  <option value="customer">Customer</option>
+                  <option value="admin">Admin</option>
+                </select>
+                <button type="submit" className="bg-[#4A8C8C] text-white p-2 rounded-md">
                   Add User
                 </button>
               </form>
             </div>
           </>
         ) : (
-          <p className="text-red-500">Access denied. Only admins can view this page.</p>
+          <p className="text-red-500 text-center">Access denied. Admins only.</p>
         )}
       </div>
     </AuthProvider>
