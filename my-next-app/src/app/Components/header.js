@@ -1,26 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react"; 
 import { useAuth } from "@/context/AuthContext"; // Import auth hook
 import Link from "next/link";
 import ImageComponent from "./imageComponent";
-import { ShoppingCart } from "lucide-react"
-import PopupCart from "./PopupCart"
-import { useCart } from "../../context/CartContext"
-
+import { ShoppingCart } from "lucide-react";
+import PopupCart from "./PopupCart";
+import { useCart } from "../../context/CartContext";
 
 const Header = () => {
   const { user, logout } = useAuth(); // Get user and logout function
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  //const [isCartOpen, setIsCartOpen] = useState(false); // State for cart popup
-  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const { cartCount, loading } = useCart();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null); // Reference to dropdown
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-  
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  //const toggleCart = () => setIsCartOpen(!isCartOpen); // Toggle cart visibility
+
   if (loading) {
     return <div>Loading...</div>; // You can add a loading spinner or something similar
   }
@@ -59,14 +70,18 @@ const Header = () => {
       </button>
 
       {/* Mobile Menu */}
-      <div className={`md:hidden ${isMenuOpen ? "block" : "hidden"}`}>
-        <nav className="space-y-4">
-          <Link href="/">Home</Link>
-          <Link href="/about">About</Link>
-          <Link href="/totes">Totes</Link>
-          <Link href="/contact">Contact</Link>
-        </nav>
-      </div>
+     {/* Mobile Menu */}
+{/* Mobile Menu */}
+<div className={`md:hidden ${isMenuOpen ? "absolute top-full left-0 w-full bg-white shadow-md z-50" : "hidden"}`}>
+  <nav className="flex flex-col space-y-4 p-4">
+    <Link href="/" className="block py-2">Home</Link>
+    <Link href="/about" className="block py-2">About</Link>
+    <Link href="/totes" className="block py-2">Totes</Link>
+    <Link href="/contact" className="block py-2">Contact</Link>
+  </nav>
+</div>
+
+
 
       {/* Icons as Buttons */}
       <div className="flex space-x-4 items-center relative">
@@ -80,16 +95,7 @@ const Header = () => {
             />
           </Link>
         ) : (
-          <div className="relative flex flex-col items-center">
-            {isDropdownOpen && (
-              <div className="absolute top-[-120%] right-0 w-48 bg-white border rounded shadow-md z-50">
-                <button onClick={logout} className="block w-full text-left px-4 py-2 hover:bg-gray-200">Logout</button>
-                {user.role === "admin" && (
-                  <Link href="/admin" className="block px-4 py-2 hover:bg-gray-200">Admin Panel</Link>
-                )}
-                <Link href="/orderHistory" className="block px-4 py-2 hover:bg-gray-200">Orders History</Link>
-              </div>
-            )}
+          <div className="relative flex flex-col items-center" ref={dropdownRef}>
             <button onClick={toggleDropdown} className="focus:outline-none">
               <ImageComponent 
                 src="https://i.ibb.co/z04cdbb/image-13-1.png" 
@@ -98,6 +104,21 @@ const Header = () => {
                 height={25} 
               />
             </button>
+            {isDropdownOpen && (
+              <div className="absolute top-[110%] right-0 w-48 bg-white border rounded shadow-md z-50">
+                <button onClick={logout} className="block w-full text-left px-4 py-2 hover:bg-gray-200">
+                  Logout
+                </button>
+                {user.role === "admin" && (
+                  <Link href="/admin" className="block px-4 py-2 hover:bg-gray-200">
+                    Admin Panel
+                  </Link>
+                )}
+                <Link href="/orderHistory" className="block px-4 py-2 hover:bg-gray-200">
+                  Orders History
+                </Link>
+              </div>
+            )}
           </div>
         )}
 

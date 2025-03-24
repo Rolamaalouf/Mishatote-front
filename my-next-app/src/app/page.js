@@ -164,7 +164,7 @@ export default function Home() {
 </div>
 
 {user && (
-  <div className="absolute top-30 right-0 transform -translate-x-1/2 text-center text-xl font-semibold text-black z-50">
+  <div className="absolute top-30 right-0 transform -translate-x-1/2 text-center text-xl font-semibold text-black z-10">
     <p>Welcome back, {user.name}!</p>
   </div>
 )}
