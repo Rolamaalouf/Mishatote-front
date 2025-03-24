@@ -14,7 +14,10 @@ const Header = () => {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const { cartCount, loading } = useCart();
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   //const toggleCart = () => setIsCartOpen(!isCartOpen); // Toggle cart visibility
