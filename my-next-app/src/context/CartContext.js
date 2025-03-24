@@ -9,6 +9,11 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([])
   const [cartCount, setCartCount] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+
+  const toggleCart = () => {
+    setIsCartOpen(!isCartOpen)
+  }
 
   const fetchCart = async () => {
     try {
@@ -54,12 +59,75 @@ export function CartProvider({ children }) {
     }
   }
 
+  const updateCartItem = async (productId, quantity) => {
+    try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
+        {
+          quantity,
+        },
+        {
+          withCredentials: true,
+        },
+      )
+
+      // Refresh cart after updating
+      fetchCart()
+      return true
+    } catch (err) {
+      console.error("Error updating cart item:", err)
+      return false
+    }
+  }
+
+  const removeCartItem = async (productId) => {
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`, {
+        withCredentials: true,
+      })
+
+      // Refresh cart after removing
+      fetchCart()
+      return true
+    } catch (err) {
+      console.error("Error removing cart item:", err)
+      return false
+    }
+  }
+
+  const clearCart = async () => {
+    try {
+      // Delete items one by one
+      const deletePromises = cartItems.map(item => 
+        axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${item.product_id}`, {
+          withCredentials: true,
+        })
+      )
+      
+      // Wait for all delete operations to complete
+      await Promise.all(deletePromises)
+      
+      // Update local state
+      setCartItems([])
+      setCartCount(0)
+      return true
+    } catch (err) {
+      console.error("Error clearing cart:", err)
+      return false
+    }
+  }
+
   const value = {
     cartItems,
     cartCount,
     loading,
     fetchCart,
     addToCart,
+    updateCartItem,
+    removeCartItem,
+    clearCart,
+    isCartOpen,
+    toggleCart,
   }
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

@@ -2,14 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext"; // Import auth hook
 import Link from "next/link";
 import ImageComponent from "./imageComponent";
-import { ShoppingCart } from "lucide-react";
-import PopupCart from "./PopupCart";
-import { useCart } from "../../context/CartContext";
+import { ShoppingCart } from "lucide-react"
+import CartPopup from "./CartPopup"
+import { useCart } from "../../context/CartContext"
+//import CartPopup from "@/Components/CartPopup";
+
 
 const Header = () => {
   const { user, logout } = useAuth(); // Get user and logout function
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false); // State for cart popup
   const { cartCount, loading } = useCart();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -31,7 +33,7 @@ const Header = () => {
   }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
+  const toggleCart = () => setIsCartOpen(!isCartOpen); // Toggle cart visibility
   if (loading) {
     return <div>Loading...</div>; // You can add a loading spinner or something similar
   }
@@ -122,34 +124,33 @@ const Header = () => {
           </div>
         )}
 
-        <Link href="/cart">
+        <Link href="/wishlist">
           <ImageComponent 
-            src="https://i.ibb.co/3mt2BFXt/Cart.png" 
-            alt="Cart" 
+            src="https://i.ibb.co/spm9LYcK/Vector.png" 
+            alt="Wishlist" 
             width={25} 
             height={25} 
           />
         </Link>
-             {/* Cart Button */}
-       <div className="flex items-center space-x-4">
-       <button
-         onClick={() => setIsCartOpen(true)}
-         className="relative p-2 text-gray-700 hover:text-[#4A8C8C] transition-colors"
-         aria-label="Open cart"
-       >
-         <ShoppingCart size={24} />
-         {cartCount > 0 && (
-           <span className="absolute -top-1 -right-1 bg-[#4A8C8C] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-             {cartCount}
-           </span>
-         )}
-       </button>
-     </div>
-   </div>
 
-   {/* Popup Cart */}
-   <PopupCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
- </header>
-);
-};
+  {/* Cart Button */}
+  <button
+          onClick={toggleCart}
+          className="relative p-2 text-gray-700 hover:text-[#4A8C8C] transition-colors"
+          aria-label="Open cart"
+        >
+          <ShoppingCart size={24} />
+          {cartCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-[#4A8C8C] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {cartCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Cart Popup */}
+      <CartPopup isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+    </header>
+  )
+}
 export default Header;
