@@ -223,6 +223,16 @@ const clearCart = async () => {
                 
                 {displayItems.map((item) => (
                   <div key={item.product_id} className="flex items-center border-b pb-6">
+                     {/* Product Image */}
+                     {item.Product?.image && (
+                      <div className="w-20 h-20 flex-shrink-0 mr-4">
+                        <img
+                          src={item.Product.image || "/placeholder.svg"}
+                          alt={item.Product.name || "Product"}
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      </div>
+                    )}
                     
                     <div className="ml-4 flex-grow">
                       <div className="flex justify-between">
