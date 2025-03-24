@@ -127,6 +127,41 @@ useEffect(() => {
     return (Math.round(price * 100) / 100).toFixed(2)
   }
 
+// Clear entire cart
+const clearCart = async () => {
+  try {
+    // Since there's no endpoint to clear the entire cart,
+    // we'll delete items one by one
+    const deletePromises = cartItems.map(item => 
+      axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${item.product_id}`, {
+        withCredentials: true,
+      })
+    );
+    
+    // Wait for all delete operations to complete
+    await Promise.all(deletePromises);
+    
+    // Update local state
+    setCartItems([]);
+  } catch (err) {
+    console.error("Error clearing cart:", err);
+  }
+}
+// More efficient approach using your existing endpoint
+/*const clearCart = async () => {
+  try {
+    await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/clear`, {
+      withCredentials: true,
+    })
+    
+    // Update local state
+    setCartItems([])
+  } catch (err) {
+    console.error("Error clearing cart:", err)
+  }
+}*/
+
+  
   const displayItems = cartItems;
   const displaySubtotal = subtotal;
   const displayTotal = displaySubtotal;// No delivery fee added here as per the previous change
@@ -175,6 +210,16 @@ useEffect(() => {
               </div>
             ) : (
               <div className="space-y-6">
+                <div className="flex justify-between items-center pb-4 border-b">
+                  <h2 className="text-xl font-semibold">Cart Items</h2>
+              <button 
+                onClick={clearCart}
+                className="flex items-center text-red-500 hover:text-red-700 transition-colors"
+              >
+              <Trash2 size={16} className="mr-1" />
+              Clear Cart
+              </button>
+              </div>
                 
                 {displayItems.map((item) => (
                   <div key={item.product_id} className="flex items-center border-b pb-6">
