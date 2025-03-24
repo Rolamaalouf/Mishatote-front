@@ -11,7 +11,7 @@ const Footer = () => {
           <p className="text-lg font-semibold">Monday to Friday 9 AM - 9 PM GMT</p>
           <p className="text-lg font-semibold">Saturday 10 AM - 9 PM GMT</p>
           <p className="text-lg font-semibold mt-2">961 3 734 990</p>
-          <p className="text-lg font-semibold underline cursor-pointer">Email us</p>
+         
           </center>
         </div>
 

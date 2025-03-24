@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from "next/navigation";
 import axios from 'axios';
-import OrdersHistory from '@/app/Components/itemuser';
 
 const OrderItemsPage = () => {
     const searchParams = useSearchParams();
@@ -103,7 +102,7 @@ const OrderItemsPage = () => {
               </table>
             </div>
           )}
-          <OrdersHistory/>
+        
         </div>
       );
     };

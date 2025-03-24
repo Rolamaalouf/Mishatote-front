@@ -1,6 +1,6 @@
 "use client"
 import { ShoppingBag } from "lucide-react"
-import { useCart } from "../context/CartContext"
+import { useCart } from "../../context/CartContext"
 
 export default function CartButton() {
   const { toggleCart, itemCount } = useCart()
