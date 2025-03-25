@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEye, FaTrash, FaEdit } from "react-icons/fa";
 import Link from "next/link";
+import DeliveryFeeManager from "@/app/Components/DeliveryFeeManager";
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
@@ -76,7 +77,9 @@ const Orders = () => {
     }, []);
 
     return (
+        
         <div className="flex flex-col items-left p-4">
+              <DeliveryFeeManager  />
             <h1 className="text-2xl font-bold mb-4 text-left p-8">Manage Orders</h1>
             {error && <p className="text-red-500">{error}</p>}
 
@@ -105,7 +108,7 @@ const Orders = () => {
                                         </button>
                                     </Link>
                                     <button
-                                        className="text-yellow-500 hover:text-yellow-700"
+                                        className="text-yellow-700 hover:text-yellow-500"
                                         onClick={() => handleEditClick(order)}
                                     >
                                         <FaEdit className="h-5 w-5" />
@@ -139,7 +142,7 @@ const Orders = () => {
                                 >
                                     <option value="pending">Pending</option>
                                     <option value="processing">Processing</option>
-                                    <option value="completed">Completed</option>
+                                    <option value="delivered">Delivered</option>
                                     <option value="canceled">Canceled</option>
                                 </select>
                             </label>
