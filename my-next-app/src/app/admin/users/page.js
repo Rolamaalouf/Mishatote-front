@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { AuthProvider } from "@/context/AuthContext";
-import { FiTrash } from "react-icons/fi";
-import { validateAddress } from "@/app/Components/checkout/utils/validation"; // Import validation utility
-import AddressForm from "@/app/Components/checkout/AddressForm"
+import { FiTrash, FiEdit } from "react-icons/fi";
+import { validateAddress } from "@/app/Components/checkout/utils/validation";
+import AddressForm from "@/app/Components/checkout/AddressForm";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -14,7 +14,9 @@ const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [roleFilter, setRoleFilter] = useState("all");
+  const [editUserId, setEditUserId] = useState(null);
   const [newUser, setNewUser] = useState({
+    id: null,
     name: "",
     email: "",
     password: "",
@@ -76,27 +78,14 @@ const UsersPage = () => {
     e.preventDefault();
     setFormErrors({});
 
-    // Validate address before submission
     if (!validateAddress(newUser.address)) {
-      return; // Prevent form submission if validation fails
+      return;
     }
 
     try {
       await axios.post(`${API_URL}/users/register`, newUser, { withCredentials: true });
       fetchUsers();
-      setNewUser({
-        name: "",
-        email: "",
-        password: "",
-        address: {
-          region: "",
-          "address-direction": "",
-          phone: "",
-          building: "",
-          floor: "",
-        },
-        role: "customer",
-      });
+      resetForm();
       toast.success("User added successfully!");
     } catch (error) {
       toast.error("Failed to add user.");
@@ -114,12 +103,65 @@ const UsersPage = () => {
     }
   };
 
+  const handleEditUser = (user) => {
+    setEditUserId(user.id);
+    setNewUser({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: "",
+      address: user.address || {
+        region: "",
+        "address-direction": "",
+        phone: "",
+        building: "",
+        floor: "",
+      },
+      role: user.role,
+    });
+  };
+
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    setFormErrors({});
+
+    if (!validateAddress(newUser.address)) {
+      return;
+    }
+
+    try {
+      await axios.put(`${API_URL}/users/${editUserId}`, newUser, { withCredentials: true });
+      fetchUsers();
+      resetForm();
+      toast.success("User updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update user.");
+    }
+  };
+
+  const resetForm = () => {
+    setEditUserId(null);
+    setNewUser({
+      id: null,
+      name: "",
+      email: "",
+      password: "",
+      address: {
+        region: "",
+        "address-direction": "",
+        phone: "",
+        building: "",
+        floor: "",
+      },
+      role: "customer",
+    });
+  };
+
   return (
     <AuthProvider>
       <div className="p-4 max-w-4xl mx-auto">
         <ToastContainer />
         <h1 className="text-2xl font-bold text-center">Manage Users</h1>
-
         {isAdmin ? (
           <>
             {/* Role Filter */}
@@ -174,6 +216,9 @@ const UsersPage = () => {
                             <button onClick={() => handleDeleteUser(user.id)} className="text-red-500">
                               <FiTrash className="inline-block h-5 w-5" />
                             </button>
+                            <button onClick={() => handleEditUser(user)} className="text-blue-500">
+                              <FiEdit className="inline-block h-5 w-5" />
+                            </button>
                           </td>
                         </tr>
                       ))
@@ -183,53 +228,101 @@ const UsersPage = () => {
               </div>
             )}
 
-            {/* Add User Form */}
+            {/* Add or Edit User Form */}
             <div className="my-6 bg-gray-100 p-4 rounded-md">
-              <h2 className="text-xl font-bold mb-2">Add User</h2>
-              <form onSubmit={handleAddUser} className="flex flex-col gap-3">
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={newUser.name}
-                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                  required
-                  className="border p-2 rounded-md"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={newUser.email}
-                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                  required
-                  className="border p-2 rounded-md"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={newUser.password}
-                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                  required
-                  className="border p-2 rounded-md"
-                />
+              {editUserId ? (
+                <>
+                  <h2 className="text-xl font-bold mb-2">Edit User</h2>
+                  <form onSubmit={handleUpdateUser} className="flex flex-col gap-3">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={newUser.name}
+                      onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                      required
+                      className="border p-2 rounded-md"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                      required
+                      className="border p-2 rounded-md"
+                    />
+                    <select
+                      value={newUser.role}
+                      onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                      className="border p-2 rounded-md"
+                    >
+                      <option value="customer">Customer</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                    {/* Address Form */}
+                    <AddressForm
+                      address={newUser.address}
+                      updateAddress={(updatedAddress) =>
+                        setNewUser({ ...newUser, address: { ...newUser.address, ...updatedAddress } })
+                      }
+                    />
+                    <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
+                      Update User
+                    </button>
+                    <button type="button" onClick={resetForm} className="bg-gray-400 text-white p-2 rounded-md">
+                      Cancel
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-xl font-bold mb-2">Add User</h2>
+                  <form onSubmit={handleAddUser} className="flex flex-col gap-3">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={newUser.name}
+                      onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                      required
+                      className="border p-2 rounded-md"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                      required
+                      className="border p-2 rounded-md"
+                    />
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                      required
+                      className="border p-2 rounded-md"
+                    />
 
-                {/* Address Form */}
-                <AddressForm
-                  address={newUser.address}
-                  updateAddress={(updatedAddress) => setNewUser({ ...newUser, address: { ...newUser.address, ...updatedAddress } })}
-                />
-
-                <select
-                  value={newUser.role}
-                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                  className="border p-2 rounded-md"
-                >
-                  <option value="customer">Customer</option>
-                  <option value="admin">Admin</option>
-                </select>
-                <button type="submit" className="bg-[#4A8C8C] text-white p-2 rounded-md">
-                  Add User
-                </button>
-              </form>
+                    {/* Address Form */}
+                    <AddressForm
+                      address={newUser.address}
+                      updateAddress={(updatedAddress) =>
+                        setNewUser({ ...newUser, address: { ...newUser.address, ...updatedAddress } })
+                      }
+                    />
+                    <select
+                      value={newUser.role}
+                      onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                      className="border p-2 rounded-md"
+                    >
+                      <option value="customer">Customer</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                    <button type="submit" className="bg-[#4A8C8C] text-white p-2 rounded-md">
+                      Add User
+                    </button>
+                  </form>
+                </>
+              )}
             </div>
           </>
         ) : (
