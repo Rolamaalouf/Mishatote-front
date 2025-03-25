@@ -103,6 +103,7 @@ export function CartProvider({ children }) {
           withCredentials: true,
         })
       )
+   
       
       // Wait for all delete operations to complete
       await Promise.all(deletePromises)
@@ -116,6 +117,22 @@ export function CartProvider({ children }) {
       return false
     }
   }
+  const checkout = async () => {
+    try {
+      // Here you would normally make an API call to process the checkout
+      // For example:
+      // await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/checkout`, {}, { withCredentials: true })
+      
+      // After successful checkout, clear the cart
+      setCartItems([])
+      setCartCount(0)
+      
+      return true
+    } catch (err) {
+      console.error("Error during checkout:", err)
+      return false
+    }
+  }
 
   const value = {
     cartItems,
@@ -126,6 +143,7 @@ export function CartProvider({ children }) {
     updateCartItem,
     removeCartItem,
     clearCart,
+    checkout, // Now this will be defined
     isCartOpen,
     toggleCart,
   }

@@ -11,8 +11,7 @@ import { useCart } from "../../context/CartContext"
 const Header = () => {
   const { user, logout } = useAuth(); // Get user and logout function
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false); // State for cart popup
-  const { cartCount, loading } = useCart();
+  const { cartCount, loading, isCartOpen, toggleCart } = useCart(); // Use everything from context
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null); // Reference to dropdown
@@ -33,7 +32,6 @@ const Header = () => {
   }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const toggleCart = () => setIsCartOpen(!isCartOpen); // Toggle cart visibility
   if (loading) {
     return <div>Loading...</div>; // You can add a loading spinner or something similar
   }
@@ -149,7 +147,7 @@ const Header = () => {
       </div>
 
       {/* Cart Popup */}
-      <CartPopup isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartPopup isOpen={isCartOpen} onClose={toggleCart} />
     </header>
   )
 }
