@@ -5,6 +5,7 @@ import axios from "axios";
 import { FaEye, FaTrash, FaEdit } from "react-icons/fa";
 import Link from "next/link";
 import DeliveryFeeManager from "@/app/Components/DeliveryFeeManager";
+import { ToastContainer,toast } from "react-toastify";
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
@@ -28,21 +29,28 @@ const Orders = () => {
             setError("Unable to get orders");
         }
     };
+ 
 
     const deleteOrder = async (orderId) => {
         try {
             const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/delete`, {
-                withCredentials: true, // Ensure cookies are sent with the request
+                withCredentials: true,
             });
-
+    
             if (response.status === 200) {
                 setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
+                toast.success("Order deleted successfully");
             }
-        } catch (err) {
-            console.error("Error deleting order:", err);
-            setError("Unable to delete order");
-        }
+        } catch (err) { 
+            const message =
+                err?.response?.data?.error ||
+                err?.message ||
+                "Unable to delete order";
+    
+            toast.error(message);  
+         }
     };
+    
 
     const handleEditClick = (order) => {
         setEditOrderData(order);
@@ -165,6 +173,8 @@ const Orders = () => {
                     </div>
                 </div>
             )}
+            <ToastContainer position="top-center" autoClose={3000} />
+
         </div>
     );
 };
