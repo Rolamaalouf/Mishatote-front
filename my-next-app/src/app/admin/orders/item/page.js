@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from "next/navigation";
 import axios from 'axios';
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FiEdit, FiTrash } from "react-icons/fi";
 
 const OrderItemsPage = () => {
     const searchParams = useSearchParams();
@@ -171,16 +171,16 @@ const handleEditChange = (e) => {
                                     <td className="py-2 px-4 border text-center">${products[item.product_id]?.price || "-"}</td>
                                     <td className="py-2 px-4 border text-center">
                                         <button 
-                                            className="text-yellow-500 hover:text-yellow-700 mx-2" 
+                                            className="text-[#A68F7B] mx-2  hover:scale-105 transition" 
                                             onClick={() => handleEditClick(item)}
                                         >
-                                            <FaEdit />
+                                            <FiEdit />
                                         </button>
                                         <button 
-                                            className="text-red-500 hover:text-red-700" 
+                                            className="text-red-700 hover:text-red-500  hover:scale-105 transition" 
                                             onClick={() => deleteOrderItem(item.id)}
                                         >
-                                            <FaTrash />
+                                            <FiTrash />
                                         </button>
                                     </td>
                                 </tr>

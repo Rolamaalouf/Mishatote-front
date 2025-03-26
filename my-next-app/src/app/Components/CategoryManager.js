@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
+import { FiPlus, FiTrash, FiEdit } from "react-icons/fi";
 import axios from "axios";
 
 export default function CategoryManager() {
@@ -71,7 +71,7 @@ export default function CategoryManager() {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Manage Categories</h2>
         <button onClick={openCreateModal} className="flex items-center gap-2 px-3 py-2 bg-[#4A8C8C] text-white hover:bg-[#A68F7B] rounded shadow">
-          <FaPlus /> Add Category
+          <FiPlus /> Add Category
         </button>
       </div>
 
@@ -80,8 +80,8 @@ export default function CategoryManager() {
           <div key={cat.id} className="border p-3 rounded flex justify-between items-center">
             <span>{cat.name}</span>
             <div className="flex gap-2">
-              <button onClick={() => openEditModal(cat)} className="text-[#A68F7B]"><FaEdit /></button>
-              <button onClick={() => handleDelete(cat.id)} className="text-red-600"><FaTrash /></button>
+              <button onClick={() => openEditModal(cat)} className="text-[#A68F7B]  hover:scale-105 transition"><FiEdit /></button>
+              <button onClick={() => handleDelete(cat.id)} className="text-red-700  hover:scale-105 transition"><FiTrash /></button>
             </div>
           </div>
         ))}
