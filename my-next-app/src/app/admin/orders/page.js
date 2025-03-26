@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FaEye, FaTrash, FaEdit } from "react-icons/fa";
+import { FiEye, FiTrash, FiEdit } from "react-icons/fi";
 import Link from "next/link";
 import DeliveryFeeManager from "@/app/Components/DeliveryFeeManager";
 import { ToastContainer,toast } from "react-toastify";
@@ -112,20 +112,20 @@ const Orders = () => {
                                 <div className="flex justify-center items-center space-x-4">
                                     <Link href={`/admin/orders/item?orderId=${order.id}`}>
                                         <button className="flex items-center text-blue-500 hover:text-blue-700">
-                                            <FaEye className="h-5 w-5" />
+                                            <FiEye className="h-5 w-5" />
                                         </button>
                                     </Link>
                                     <button
-                                        className="text-yellow-700 hover:text-yellow-500"
+                                        className="text-[#A68F7B] hover:scale-105 transition"
                                         onClick={() => handleEditClick(order)}
                                     >
-                                        <FaEdit className="h-5 w-5" />
+                                        <FiEdit className="h-5 w-5" />
                                     </button>
                                     <button
-                                            className="text-red-500 hover:text-red-700"
+                                            className="text-red-700 hover:text-red-500"
                                             onClick={() => deleteOrder(order.id)}
                                         >
-                                            <FaTrash className="h-5 w-5" />
+                                            <FiTrash className="h-5 w-5  hover:scale-105 transition" />
                                         </button>
                                 </div>
                             </td>

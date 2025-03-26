@@ -213,11 +213,11 @@ const UsersPage = () => {
                               : "N/A"}
                           </td>
                           <td className="border p-2">
-                            <button onClick={() => handleDeleteUser(user.id)} className="text-red-500">
-                              <FiTrash className="inline-block h-5 w-5" />
+                            <button onClick={() => handleDeleteUser(user.id)} className="text-red-700">
+                              <FiTrash className="inline-block h-5 w-5 text-red-700 hover:scale-105 transition " />
                             </button>
-                            <button onClick={() => handleEditUser(user)} className="text-blue-500">
-                              <FiEdit className="inline-block h-5 w-5" />
+                            <button onClick={() => handleEditUser(user)} className="text-[#A68F7B]">
+                              <FiEdit className="inline-block h-5 w-5 hover:scale-105 transition " />
                             </button>
                           </td>
                         </tr>
