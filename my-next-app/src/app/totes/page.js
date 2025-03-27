@@ -20,14 +20,18 @@ export default function Products() {
   const [sortOrder, setSortOrder] = useState("lowToHigh");
 
   const router = useRouter();
+
+  useEffect(() => {
   const searchParams = useSearchParams();
 
   const categoryFromURL = searchParams.get("category");
   const modalProductId = searchParams.get("modal");
+}, []);
 
   useEffect(() => {
     if (categoryFromURL) {
       setSelectedCategory(categoryFromURL);
+      
       
     }
   }, [categoryFromURL]);
