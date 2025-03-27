@@ -99,12 +99,18 @@ const Header = () => {
         ) : (
           <div className="relative flex flex-col items-center" ref={dropdownRef}>
             <button onClick={toggleDropdown} className="focus:outline-none">
+            <div style={{
+      width: '15%',
+      height: 'auto',
+      marginLeft: 'auto',
+    }}>
               <ImageComponent 
                 src="https://i.ibb.co/z04cdbb/image-13-1.png" 
                 alt="User" 
                 width={25} 
                 height={25} 
               />
+                </div>
             </button>
             {isDropdownOpen && (
               <div className="absolute top-[110%] right-0 w-48 bg-white border rounded shadow-md z-50">
@@ -124,14 +130,7 @@ const Header = () => {
           </div>
         )}
 
-        <Link href="/wishlist">
-          <ImageComponent 
-            src="https://i.ibb.co/spm9LYcK/Vector.png" 
-            alt="Wishlist" 
-            width={25} 
-            height={25} 
-          />
-        </Link>
+
 
   {/* Cart Button */}
   <button
