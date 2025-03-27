@@ -84,7 +84,7 @@ const Contact = () => {
     };
 
     return (
-        <div className="px-6 py-12 bg-gray-100">
+        <div className="bg-gray-100">
             {/* Header Component */}
             <Header />
 

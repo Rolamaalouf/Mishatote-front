@@ -126,7 +126,7 @@ export default function Products() {
   )
 
   return (
-    <div className="relative w-full min-h-screen mt-20 py-12 max-w-full overflow-x-hidden">
+    <div className="relative w-full min-h-screen mt-20  max-w-full overflow-x-hidden">
       <Head>
         <title>Products</title>
       </Head>
