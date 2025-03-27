@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from "next/navigation";
 import axios from 'axios';
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FiEdit, FiTrash } from "react-icons/fi";
 
 const OrderItemsPage = () => {
     const searchParams = useSearchParams();
@@ -130,15 +130,15 @@ const handleEditChange = (e) => {
     };
 
     return (
-      <div className={`p-4 ${isEditModalOpen ? "opacity-50" : ""}`}>
+        <div className="flex flex-col items-left p-4">
 
-            <h1 className="text-2xl font-bold mb-4">Order Items for Order {orderId}</h1>
+            <h1 className="text-2xl font-bold my-8 text-left p-0">Order Items for Order {orderId}</h1>
             {error && <p className="text-red-500">{error}</p>}
             
             {orderItems.length === 0 ? (
                 <p>No items found for this order.</p>
             ) : (
-                <div className="overflow-x-auto">
+                
                     <table className="min-w-full border border-gray-300 shadow-md rounded-md">
                         <thead>
                         <tr className="bg-gray-200" style={{ backgroundColor: "#4A8C8C", color: "white" }}>
@@ -171,63 +171,64 @@ const handleEditChange = (e) => {
                                     <td className="py-2 px-4 border text-center">${products[item.product_id]?.price || "-"}</td>
                                     <td className="py-2 px-4 border text-center">
                                         <button 
-                                            className="text-yellow-500 hover:text-yellow-700 mx-2" 
+                                            className="text-[#A68F7B] mx-2  hover:scale-105 transition" 
                                             onClick={() => handleEditClick(item)}
                                         >
-                                            <FaEdit />
+                                            <FiEdit />
                                         </button>
                                         <button 
-                                            className="text-red-500 hover:text-red-700" 
+                                            className="text-red-700 hover:text-red-500  hover:scale-105 transition" 
                                             onClick={() => deleteOrderItem(item.id)}
                                         >
-                                            <FaTrash />
+                                            <FiTrash />
                                         </button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </div>
+        
             )}
 
             {/* Edit Modal */}
             {isEditModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-                        <h2 className="text-xl font-semibold mb-4">Edit Order Item</h2>
-                        <form onSubmit={submitEditOrder}>
-                            <label className="block mb-2">Quantity</label>
-                            <input
-                                type="number"
-                                name="quantity"
-                                value={editItemData.quantity}
-                                onChange={handleEditChange}
-                                className="w-full p-2 border rounded-md"
-                                required
-                            />
-                            <p className="mt-2 text-gray-700">
-    Updated Price: <strong>${editItemData.price}</strong>
-</p>
+    <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md">
+        <div className="bg-white p-6 rounded-lg w-1/3 border border-gray-300">
+            <h2 className="text-xl font-semibold mb-4">Edit Order Item</h2>
+            <form onSubmit={submitEditOrder}>
+                <label className="block mb-2">Quantity</label>
+                <input
+                    type="number"
+                    name="quantity"
+                    value={editItemData.quantity}
+                    onChange={handleEditChange}
+                    className="w-full p-2 border rounded-md"
+                    required
+                />
+                <p className="mt-2 text-gray-700">
+                    Updated Price: <strong>${editItemData.price}</strong>
+                </p>
 
-                            <div className="flex justify-end mt-4">
-                                <button
-                                    type="button"
-                                    className="px-4 py-2 mr-2 bg-gray-500 text-white rounded-md"
-                                    onClick={() => setIsEditModalOpen(false)}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                                >
-                                    Save
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                <div className="flex justify-end mt-4">
+                    <button
+                        type="button"
+                        className="px-4 py-2 mr-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
+                        onClick={() => setIsEditModalOpen(false)}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+                    >
+                        Save
+                    </button>
                 </div>
-            )}
+            </form>
+        </div>
+    </div>
+)}
+
         </div>
     );
 };
