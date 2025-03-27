@@ -15,30 +15,18 @@ const Footer = () => {
           </center>
         </div>
 
-        {/* Second Column - Newsletter */}
-        <div>
-          <center>
-          <p className="text-lg mb-4">
-            Receive our newsletter and discover our stories, collections, and surprises.
-          </p>
-          <button className="bg-[#4A8C8C] text-white px-6 py-2 text-lg rounded-md">
-            Subscribe
-          </button>
-          </center>
-        </div>
-
-        {/* Third Column - Social Icons */}
-        <div className="flex justify-center md:justify-end gap-6 mr-20">
-          <a href="https://wa.me/9613734990" target="_blank" rel="noopener noreferrer">
-            <FaWhatsapp className="text-3xl " />
-          </a>
-          <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
-            <FaInstagram className="text-3xl" />
-          </a>
-          <a href="mailto:your-email@example.com">
-            <FaEnvelope className="text-3xl" />
-          </a>
-        </div>
+ {/* Third Column - Social Icons (Centered Below) */}
+<div className="flex justify-center gap-6 mt-4">
+  <a href="https://wa.me/9613734990" target="_blank" rel="noopener noreferrer">
+    <FaWhatsapp className="text-3xl text-black hover:text-gray-700" />
+  </a>
+  <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+    <FaInstagram className="text-3xl text-black hover:text-gray-700" />
+  </a>
+  <a href="mailto:your-email@example.com">
+    <FaEnvelope className="text-3xl text-black hover:text-gray-700" />
+  </a>
+</div>
 
       </div>
     </footer>

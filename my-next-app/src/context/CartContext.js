@@ -16,6 +16,12 @@ export function CartProvider({ children }) {
   }
 
   const fetchCart = async () => {
+    //Don't fetch if there's no API URL configured
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      console.error("API URL not configured")
+      setLoading(false)
+      return
+    }
     try {
       setLoading(true)
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
