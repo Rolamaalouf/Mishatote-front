@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/AuthContext"
 import { ToastContainer } from "react-toastify"
+import { useCart } from "@/context/CartContext" // Add this import
 import "react-toastify/dist/ReactToastify.css"
 
 import { fetchCheckoutData } from "./checkout/utils/api"
@@ -18,6 +19,7 @@ import BackButton from "./checkout/BackButton"
 
 export default function Checkout() {
   const { user } = useAuth()
+  const { checkout } = useCart() // Get checkout function from cart context
   const router = useRouter()
   const [state, setState] = useState({
     paymentMethod: "cod",
@@ -64,6 +66,17 @@ export default function Checkout() {
         updateState({ isLoading: false })
       })
   }, [])
+  // Add this function to your Checkout component
+     const placeOrder = async () => {
+        try {
+    // Call the checkout function to clear the cart
+        await checkout()
+        return true
+        } catch (error) {
+    console.error("Error clearing cart:", error)
+        return false
+  }
+}
 
   // Conditional rendering based on state
   if (state.isLoading) return <LoadingState />
@@ -84,6 +97,7 @@ export default function Checkout() {
             updateState={updateState}
             updateAddress={updateAddress}
             updatePayment={updatePayment}
+            placeOrder={placeOrder} // Pass the placeOrder function
           />
           <OrderSummary cartItems={state.cartItems} orderSummary={state.orderSummary} />
         </div>

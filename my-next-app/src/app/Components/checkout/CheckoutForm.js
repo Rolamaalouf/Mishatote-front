@@ -8,7 +8,7 @@ import { notify } from "./utils/toast"
 import PaymentForm from "./PaymentForm"
 import AddressForm from "./AddressForm"
 
-export default function CheckoutForm({ paymentMethod, address, payment, updateState, updateAddress, updatePayment }) {
+export default function CheckoutForm({ paymentMethod, address, payment, updateState, updateAddress, updatePayment, placeOrder }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleCheckout = async () => {
@@ -37,6 +37,8 @@ export default function CheckoutForm({ paymentMethod, address, payment, updateSt
       })
 
       if (res.status === 201) {
+        // Call the checkout function to clear the cart
+        await placeOrder()
         updateState({ orderPlaced: true, orderId: res.data.order_id })
         notify("success", "Your order has been placed successfully!")
       }
