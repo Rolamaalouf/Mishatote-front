@@ -141,7 +141,7 @@ export default function CartPopup({ isOpen, onClose }) {
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop - darkened background */}
-      <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
+      <div className="absolute inset-0 bg-opacity-50 transition-opacity" onClick={onClose} />
 
       {/* Cart panel */}
       <div className="absolute inset-y-0 right-0 max-w-full flex">

@@ -6,7 +6,7 @@ import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FiTrash, FiEdit } from "react-icons/fi";
 import { FiFilter } from "react-icons/fi";
 
 export default function AdminProductsPage() {
@@ -35,7 +35,7 @@ export default function AdminProductsPage() {
       });
       setProducts(data);
     } catch (error) {
-      console.error("❌ Error fetching products:", error);
+      console.error(" Error fetching products:", error);
     }
   };
 
@@ -46,7 +46,7 @@ export default function AdminProductsPage() {
       });
       setCategories(data);
     } catch (error) {
-      console.error("❌ Error fetching categories:", error);
+      console.error(" Error fetching categories:", error);
     }
   };
 
@@ -230,10 +230,10 @@ export default function AdminProductsPage() {
               <p className="text-sm text-gray-700">{product.price} $</p>
               <div className="flex justify-end gap-2 mt-2">
                 <button className="p-2  text-[#A68F7B] hover:scale-105 transition" onClick={() => handleEditProduct(product)}>
-                  <FaEdit />
+                  <FiEdit />
                 </button>
-                <button className="p-2 text-red-600 hover:scale-105 transition" onClick={() => handleDeleteProduct(product.id)}>
-                  <FaTrash />
+                <button className="p-2 text-red-700 hover:scale-105 transition" onClick={() => handleDeleteProduct(product.id)}>
+                  <FiTrash />
                 </button>
               </div>
             </div>
