@@ -6,11 +6,14 @@ import Link from "next/link";
 import { FaHome, FaUsers, FaShoppingCart, FaClipboardList, FaTachometerAlt } from "react-icons/fa";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
 import { useAuth } from "@/context/AuthContext";
+ 
+ import { FiLogOut } from "react-icons/fi";
+  
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false); // Controls mobile menu
   const { user, loading } = useAuth(); 
-
+  const { logout } = useAuth(); 
   if (loading) return null;
   return (
     <div className="flex">  
@@ -49,6 +52,9 @@ const Sidebar = () => {
           <Link href="/admin/orders" className="flex items-center gap-3 hover:text-gray-300 transition">
             <FaClipboardList className="text-lg" /> Orders
           </Link>
+          <button onClick={logout} className="flex items-center gap-3 hover:text-gray-300 transition text-left">
+             <FiLogOut className="text-lg" /> Logout
+          </button>
         </div>
       </div>
 
