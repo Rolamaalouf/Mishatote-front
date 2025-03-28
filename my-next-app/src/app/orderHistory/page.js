@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Header from "../Components/header";
+import Footer from "../Components/footer";
 
 const OrdersHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -129,12 +131,15 @@ const OrdersHistory = () => {
   if (loading) return <div className="text-center text-xl">Loading...</div>;
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Order History</h1>
+    <div className="px-6 py-12 bg-gray-100">
+      <Header />
+      <div className="bg-[#A68F7B] h-[20vh] flex items-center justify-center mt-20">
+        <h1 className="text-white text-5xl sm:text-6xl font-bold text-center">Orders History</h1>
+      </div>
       {error && <div className="text-red-500 text-center">{error}</div>}
 
       {/* Date Range Filter */}
-      <div className="flex justify-center items-center flex-wrap gap-4 mb-6">
+      <div className="flex justify-center items-center flex-wrap gap-4 mb-6 mt-6">
   <label className="flex flex-col text-sm text-gray-700">
     Start Date
     <input
@@ -223,6 +228,7 @@ const OrdersHistory = () => {
           ))
         )}
       </div>
+      <Footer />
     </div>
   );
 };
