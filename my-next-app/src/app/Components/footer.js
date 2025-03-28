@@ -2,33 +2,27 @@ import { FaWhatsapp, FaInstagram, FaEnvelope } from "react-icons/fa";  // Import
 
 const Footer = () => {
   return (
-    <footer className=" text-black py-10 px-6">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+    <footer className="text-black py-10 px-6">
+      <div className="max-w-7xl mx-auto flex flex-col items-center justify-center space-y-4 text-center">
 
-        {/* First Column - Contact Info */}
-        <div>
-          <center>
-          <p className="text-lg font-semibold">Monday to Friday 9 AM - 9 PM GMT</p>
-          <p className="text-lg font-semibold">Saturday 10 AM - 9 PM GMT</p>
-          <p className="text-lg font-semibold mt-2">961 3 734 990</p>
-         
-          </center>
-        </div>
+        {/* Contact Info & Hours */}
+        <p className="text-lg font-semibold">Monday to Saturday 9 AM - 9 PM GMT</p>
 
-  
-
-        {/* Third Column - Social Icons */}
-        <div className="flex justify-center md:justify-end gap-6 mr-20">
+        {/* Social Icons */}
+        <div className="flex gap-6">
           <a href="https://wa.me/9613734990" target="_blank" rel="noopener noreferrer">
-            <FaWhatsapp className="text-3xl " />
+            <FaWhatsapp className="text-3xl text-black" />
           </a>
           <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
-            <FaInstagram className="text-3xl" />
+            <FaInstagram className="text-3xl text-black" />
           </a>
           <a href="mailto:your-email@example.com">
-            <FaEnvelope className="text-3xl" />
+            <FaEnvelope className="text-3xl text-black" />
           </a>
         </div>
+
+        {/* Copyright */}
+        <p className="text-sm text-gray-600">© 2025 Mishatoteshop. All rights reserved.</p>
 
       </div>
     </footer>
