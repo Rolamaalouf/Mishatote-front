@@ -8,6 +8,11 @@ import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { FiTrash, FiEdit } from "react-icons/fi";
 import { FiFilter } from "react-icons/fi";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';  
+import { useRef } from "react";
+
+
 
 export default function AdminProductsPage() {
   const { user } = useAuth();
@@ -28,6 +33,7 @@ export default function AdminProductsPage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [categories, setCategories] = useState([]);
 
+  const formRef = useRef(null);
   const fetchProducts = async () => {
     try {
       const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
@@ -119,7 +125,7 @@ export default function AdminProductsPage() {
       fetchProducts();
       fetchCategories();
     } catch (error) {
-      console.error("❌ Error updating product:", error);
+      console.error(" Error updating product:", error);
       toast.error("Error updating product. Please try again.");
     }
   };
@@ -129,15 +135,15 @@ export default function AdminProductsPage() {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, {
         withCredentials: true,
       });
-
-      toast.success("✅ Product deleted successfully!");
+  
+      toast.success(" Product deleted successfully!");
       fetchProducts();
     } catch (error) {
-      console.error("❌ Error deleting product:", error.response?.data || error.message);
-      toast.error("Error deleting product. Please try again.");
+      const errMsg = error.response?.data?.error || "Error deleting product. Please try again.";
+      toast.error(` ${errMsg}`);
     }
   };
-
+  
   const handleEditProduct = (product) => {
     setNewProduct({
       name: product.name,
@@ -149,6 +155,7 @@ export default function AdminProductsPage() {
     });
     setEditMode(true);
     setEditProductId(product.id);
+    formRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const parseProductImage = (imageData) => {
@@ -173,9 +180,9 @@ export default function AdminProductsPage() {
 
       <CategoryManager />
 
-      <h2 className="text-xl font-bold mb-3">{editMode ? "Edit Product" : "Add New Product"}</h2>
-      <form onSubmit={editMode ? handleUpdateProduct : handleAddProduct} className="mb-6 grid gap-4 md:grid-cols-2">
-        <input type="text" name="name" placeholder="Product Name" value={newProduct.name} onChange={handleInputChange} className="border p-2 rounded" required />
+      <h2  ref={formRef} className="text-xl font-bold mb-3">{editMode ? "Edit Product" : "Add New Product"}</h2>
+      <form onSubmit={editMode ? handleUpdateProduct : handleAddProduct} className="mb-6 grid gap-4 md:grid-cols-2">       
+         <input type="text" name="name" placeholder="Product Name" value={newProduct.name} onChange={handleInputChange} className="border p-2 rounded" required />
         <div className="relative">
           <input type="number" name="price" placeholder="Price" min="0" value={newProduct.price} onChange={handleInputChange} className="border p-2 rounded w-full pr-10" required />
           <span className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500">$</span>
@@ -232,9 +239,31 @@ export default function AdminProductsPage() {
                 <button className="p-2  text-[#A68F7B] hover:scale-105 transition" onClick={() => handleEditProduct(product)}>
                   <FiEdit />
                 </button>
-                <button className="p-2 text-red-700 hover:scale-105 transition" onClick={() => handleDeleteProduct(product.id)}>
+                <button
+                  className="p-2 text-red-700 hover:scale-105 transition"
+                  onClick={() =>
+                    confirmAlert({
+                      title: "Confirm Delete",
+                      message:(
+                        <div>
+                          Are you sure you want to delete  <strong> "{product.name}" </strong> product?
+                        </div>
+                      ),
+                      buttons: [
+                        {
+                          label: "Yes",
+                          onClick: () => handleDeleteProduct(product.id),
+                        },
+                        {
+                          label: "No",
+                        },
+                      ],
+                    })
+                  }
+                >
                   <FiTrash />
                 </button>
+
               </div>
             </div>
           ))}

@@ -6,6 +6,8 @@ import { FiEye, FiTrash, FiEdit } from "react-icons/fi";
 import Link from "next/link";
 import DeliveryFeeManager from "@/app/Components/DeliveryFeeManager";
 import { ToastContainer,toast } from "react-toastify";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
@@ -30,43 +32,62 @@ const Orders = () => {
         }
     };
 
-    const handleDeleteOrder = async (orderId, orderStatus) => {
-        console.log("Attempting to delete order:", orderId, "Status:", orderStatus); // Debugging
-    
-        // Normalize status to avoid case sensitivity issues
-        const normalizedStatus = String(orderStatus).toLowerCase();
-        
-        // Allow deletion only for pending or canceled orders
-        if (normalizedStatus !== "pending" && normalizedStatus !== "canceled") {
-            setError("Only pending or canceled orders can be deleted.");
-            return;
-        }
-    
-        try {
-            const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/delete`, {
-                withCredentials: true,
-            });
-    
-            console.log("Delete Response:", response); // Debugging API response
-    
-            if (response.status === 200) {
-                setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
-                setError(null); // Clear any previous errors
-            } else {
-                setError("Failed to delete order. Unexpected response.");
-            }
-        } catch (err) {
-            console.error("Error deleting order:", err.response?.data || err.message);
-            
-            if (err.response?.status === 403) {
-                setError("You don't have permission to delete this order.");
-            } else if (err.response?.status === 404) {
-                setError("Order not found.");
-            } else {
-                setError("Unable to delete order. Please try again.");
-            }
-        }
-    };
+    const handleDeleteOrder = (orderId, orderStatus) => {
+        confirmAlert({
+          title: "Confirm Delete",
+          message: (
+            <div>
+              Are you sure you want to delete order <strong>#{orderId}</strong>?
+            </div>
+          ),
+          buttons: [
+            {
+              label: "Yes",
+              onClick: async () => {
+                const normalizedStatus = String(orderStatus).toLowerCase();
+      
+                if (normalizedStatus !== "pending" && normalizedStatus !== "canceled") {
+                  toast.error(" Only pending or canceled orders can be deleted.", {
+                    position: "top-center",
+                  });
+                  return;
+                }
+      
+                try {
+                  const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/delete`, {
+                    withCredentials: true,
+                  });
+      
+                  if (response.status === 200) {
+                    setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
+                    toast.success("Order deleted successfully!", {
+                      position: "top-center",
+                    });
+                  } else {
+                    toast.error(" Failed to delete order. Unexpected response.", {
+                      position: "top-center",
+                    });
+                  }
+                } catch (err) {
+                  const errMsg =
+                    err.response?.data?.error ||
+                    (err.response?.status === 403
+                      ? " You don't have permission to delete this order."
+                      : err.response?.status === 404
+                      ? "Order not found."
+                      : " Unable to delete order. Please try again.");
+      
+                  toast.error(errMsg, { position: "top-center" });
+                }
+              },
+            },
+            {
+              label: "No",
+            },
+          ],
+        });
+      };
+      
     
     
 
@@ -105,6 +126,9 @@ const Orders = () => {
     return (
         
         <div className="flex flex-col items-left p-4">
+ 
+            <ToastContainer position="top-center" />
+
               <DeliveryFeeManager  />
             <h1 className="text-2xl font-bold mb-4 text-left p-8">Manage Orders</h1>
             {error && <p className="text-red-500">{error}</p>}

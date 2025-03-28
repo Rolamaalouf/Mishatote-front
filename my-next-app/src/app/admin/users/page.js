@@ -3,14 +3,19 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from "@/context/AuthContext";
 import { FiTrash, FiEdit } from "react-icons/fi";
 import { validateAddress } from "@/app/Components/checkout/utils/validation";
 import AddressForm from "@/app/Components/checkout/AddressForm";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import { useRef } from "react";
 
 const UsersPage = () => {
+  const formRef = useRef(null);
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [roleFilter, setRoleFilter] = useState("all");
@@ -92,34 +97,61 @@ const UsersPage = () => {
     }
   };
 
-  const handleDeleteUser = async (userId) => {
-    try {
-      await axios.delete(`${API_URL}/users/${userId}`, { withCredentials: true });
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
-      setFilteredUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
-      toast.success("User deleted successfully!");
-    } catch (error) {
-      toast.error("Failed to delete user.");
-    }
+  const handleDeleteUser = (userId, userName) => {
+    confirmAlert({
+      title: "Confirm Delete",
+      message: (
+        <div>
+          Are you sure you want to delete user <strong>"{userName}"</strong>?
+        </div>
+      ),
+      buttons: [
+        {
+          label: "Yes",
+          onClick: async () => {
+            try {
+              await axios.delete(`${API_URL}/users/${userId}`, {
+                withCredentials: true,
+              });
+              setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+              setFilteredUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+              toast.success("User deleted successfully!");
+            } catch (error) {
+              const errMsg = error.response?.data?.error || "Error deleting product. Please try again.";
+              toast.error(` ${errMsg}`);
+            }
+          },
+        },
+        {
+          label: "No",
+        },
+      ],
+    });
   };
+  
 
   const handleEditUser = (user) => {
+    const address = {
+      region: user.address?.region || "",
+      "address-direction": user.address?.["address-direction"] || "",
+      phone: user.address?.phone || "",
+      building: user.address?.building || "",
+      floor: user.address?.floor || "",
+    };
+  
     setEditUserId(user.id);
     setNewUser({
       id: user.id,
-      name: user.name,
-      email: user.email,
+      name: user.name || "",
+      email: user.email || "",
       password: "",
-      address: user.address || {
-        region: "",
-        "address-direction": "",
-        phone: "",
-        building: "",
-        floor: "",
-      },
-      role: user.role,
+      address,
+      role: user.role || "customer",
     });
+  
+    formRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+  
 
   const handleUpdateUser = async (e) => {
     e.preventDefault();
@@ -159,9 +191,9 @@ const UsersPage = () => {
 
   return (
     <AuthProvider>
-      <div className="p-4 max-w-4xl mx-auto">
-        <ToastContainer />
-        <h1 className="text-2xl font-bold text-center">Manage Users</h1>
+      <div className="p-4 max-w-4xl mx-auto"> 
+
+<ToastContainer position="top-center" />        <h1 className="text-2xl font-bold text-center">Manage Users</h1>
         {isAdmin ? (
           <>
             {/* Role Filter */}
@@ -213,8 +245,8 @@ const UsersPage = () => {
                               : "N/A"}
                           </td>
                           <td className="border p-2">
-                            <button onClick={() => handleDeleteUser(user.id)} className="text-red-700">
-                              <FiTrash className="inline-block h-5 w-5 text-red-700 hover:scale-105 transition " />
+                          <button onClick={() => handleDeleteUser(user.id, user.name)} className="text-red-700">
+                          <FiTrash className="inline-block h-5 w-5 text-red-700 hover:scale-105 transition " />
                             </button>
                             <button onClick={() => handleEditUser(user)} className="text-[#A68F7B]">
                               <FiEdit className="inline-block h-5 w-5 hover:scale-105 transition " />
@@ -232,7 +264,7 @@ const UsersPage = () => {
             <div className="my-6 bg-gray-100 p-4 rounded-md">
               {editUserId ? (
                 <>
-                  <h2 className="text-xl font-bold mb-2">Edit User</h2>
+                  <h2  ref={formRef} className="text-xl font-bold mb-2">Edit User</h2>
                   <form onSubmit={handleUpdateUser} className="flex flex-col gap-3">
                     <input
                       type="text"
