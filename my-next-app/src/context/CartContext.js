@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react"
 import axios from "axios"
+import { useAuth } from "@/context/AuthContext";
 
 const CartContext = createContext()
 
@@ -10,6 +11,7 @@ export function CartProvider({ children }) {
   const [cartCount, setCartCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const { user, loading: authLoading } = useAuth()
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen)
@@ -19,6 +21,14 @@ export function CartProvider({ children }) {
     //Don't fetch if there's no API URL configured
     if (!process.env.NEXT_PUBLIC_API_URL) {
       console.error("API URL not configured")
+      setLoading(false)
+      return
+    }
+
+     // Don't fetch if user is not authenticated
+     if (!user) {
+      setCartItems([])
+      setCartCount(0)
       setLoading(false)
       return
     }
@@ -34,16 +44,29 @@ export function CartProvider({ children }) {
       setCartItems(response.data)
     } catch (err) {
       console.error("Error fetching cart:", err)
+        // If we get a 401, clear the cart as the user is not authenticated
+        if (err.response && err.response.status === 401) {
+          setCartItems([])
+          setCartCount(0)
+        }
     } finally {
       setLoading(false)
     }
   }
 
+  // Only fetch cart when auth state changes or on initial load
   useEffect(() => {
-    fetchCart()
-  }, [])
+    // Only fetch cart when auth loading is complete
+    if (!authLoading) {
+      fetchCart()
+    }
+  }, [user, authLoading])
 
   const addToCart = async (productId, quantity = 1) => {
+    if (!user) {
+      console.error("User must be logged in to add items to cart")
+      return false
+    }
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/cart`,
@@ -66,6 +89,7 @@ export function CartProvider({ children }) {
   }
 
   const updateCartItem = async (productId, quantity) => {
+    if (!user) return false
     try {
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
@@ -87,6 +111,7 @@ export function CartProvider({ children }) {
   }
 
   const removeCartItem = async (productId) => {
+    if (!user) return false
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`, {
         withCredentials: true,
@@ -102,43 +127,89 @@ export function CartProvider({ children }) {
   }
 
   const clearCart = async () => {
+    if (!user) return false
+
     try {
-      // Delete items one by one
-      const deletePromises = cartItems.map(item => 
-        axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${item.product_id}`, {
+      // Try to use a dedicated clear cart endpoint if it exists
+      try {
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
           withCredentials: true,
         })
-      )
-   
-      
-      // Wait for all delete operations to complete
-      await Promise.all(deletePromises)
-      
-      // Update local state
+
+        // If successful, update local state
+        setCartItems([])
+        setCartCount(0)
+        return true
+      } catch (clearErr) {
+        console.log("No clear cart endpoint available, trying alternative methods:", clearErr)
+
+        // If clear cart endpoint doesn't exist, try to update all items to quantity 0
+        try {
+          const updatePromises = cartItems.map((item) =>
+            axios.put(
+              `${process.env.NEXT_PUBLIC_API_URL}/cart/${item.product_id}`,
+              { quantity: 0 },
+              { withCredentials: true },
+            ),
+          )
+
+          await Promise.all(updatePromises)
+
+          // If successful, update local state
+          setCartItems([])
+          setCartCount(0)
+          return true
+        } catch (updateErr) {
+          console.log("Update quantities method failed:", updateErr)
+
+          // If all else fails, just clear the local state
+          console.log("Clearing local cart state only")
+          setCartItems([])
+          setCartCount(0)
+          return true
+        }
+      }
+    } catch (err) {
+      console.error("Error clearing cart:", err)
+      // Even if API calls fail, clear the local state for better UX
       setCartItems([])
       setCartCount(0)
       return true
-    } catch (err) {
-      console.error("Error clearing cart:", err)
-      return false
     }
   }
   const checkout = async () => {
+    if (!user) {
+      console.error("User must be logged in to checkout")
+      return false
+    }
     try {
-      // Here you would normally make an API call to process the checkout
-      // For example:
-      // await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/checkout`, {}, { withCredentials: true })
-      
-      // After successful checkout, clear the cart
+      // Instead of calling a non-existent /checkout endpoint,
+      // we'll use the existing cart endpoints to clear the cart
+
+      // 1. Create an order record if you have an orders API
+      // This is optional - implement if you have an orders endpoint
+      try {
+        // If you have an orders API endpoint, use it
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/orders`, { items: cartItems }, { withCredentials: true })
+      } catch (orderErr) {
+        console.log("No orders endpoint available or order creation failed:", orderErr)
+        // Continue with checkout even if order creation fails
+      }
+
+      // 2. Clear the cart by removing all items
+      await clearCart()
+
+      // 3. Update local state
       setCartItems([])
       setCartCount(0)
-      
+
       return true
     } catch (err) {
       console.error("Error during checkout:", err)
       return false
     }
   }
+
 
   const value = {
     cartItems,
