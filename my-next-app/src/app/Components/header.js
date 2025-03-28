@@ -98,7 +98,7 @@ const Header = () => {
           <div className="relative flex flex-col items-center" ref={dropdownRef}>
             <button onClick={toggleDropdown} className="focus:outline-none">
             <div style={{
-      width: '15%',
+      width: '100%',
       height: 'auto',
       marginLeft: 'auto',
     }}>
