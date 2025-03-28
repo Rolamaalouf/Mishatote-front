@@ -121,7 +121,7 @@ const RegisterPage = () => {
 
             <button
               type="submit"
-              className="bg-[#A68F7B] text-white py-2 px-4 rounded w-full hover:bg-[#8C7260] transition duration-300"
+              className="bg-[#A68F7B] text-white py-2 px-4 rounded w-full hover:bg-[#8C7260] transition duration-300 mt-4"
             >
               Sign up
             </button>
