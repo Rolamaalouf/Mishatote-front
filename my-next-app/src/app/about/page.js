@@ -2,6 +2,7 @@
 
 
 import Header from '@/app/Components/header';
+import Footer from '@/app/Components/footer';
 const AboutUs = () => {
   return (
     <div className="bg-gray-100">
@@ -67,6 +68,7 @@ const AboutUs = () => {
           </p>
         </div>
 </div>
+<Footer />  {/* Add Footer component */}
 
     </div>
   );

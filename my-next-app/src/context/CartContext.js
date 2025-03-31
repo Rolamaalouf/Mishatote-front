@@ -68,6 +68,23 @@ export function CartProvider({ children }) {
       return false
     }
     try {
+        // Update local state immediately for better UX
+        setCartCount((prevCount) => prevCount + quantity)
+
+        // Find if the item already exists in the cart
+        const existingItem = cartItems.find((item) => item.product_id === productId)
+  
+        if (existingItem) {
+          // If item exists, update its quantity
+          setCartItems((prevItems) =>
+            prevItems.map((item) =>
+              item.product_id === productId ? { ...item, quantity: item.quantity + quantity } : item,
+            ),
+          )
+        } else {
+          // If item doesn't exist, add it to the cart
+          setCartItems((prevItems) => [...prevItems, { product_id: productId, quantity }])
+        }
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/cart`,
         {
@@ -91,6 +108,20 @@ export function CartProvider({ children }) {
   const updateCartItem = async (productId, quantity) => {
     if (!user) return false
     try {
+        // Find the current item to calculate the difference
+        const currentItem = cartItems.find((item) => item.product_id === productId)
+
+        if (currentItem) {
+          const quantityDifference = quantity - currentItem.quantity
+  
+          // Update cart count immediately for better UX
+          setCartCount((prevCount) => prevCount + quantityDifference)
+  
+          // Update local cart items for immediate feedback
+          setCartItems((prevItems) =>
+            prevItems.map((item) => (item.product_id === productId ? { ...item, quantity } : item)),
+          )
+        }
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
         {
@@ -113,6 +144,16 @@ export function CartProvider({ children }) {
   const removeCartItem = async (productId) => {
     if (!user) return false
     try {
+       // Find the current item to subtract from count
+       const currentItem = cartItems.find((item) => item.product_id === productId)
+
+       if (currentItem) {
+         // Update cart count immediately for better UX
+         setCartCount((prevCount) => prevCount - currentItem.quantity)
+ 
+         // Update local cart items for immediate feedback
+         setCartItems((prevItems) => prevItems.filter((item) => item.product_id !== productId))
+       }
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`, {
         withCredentials: true,
       })
