@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import emailjs from "@emailjs/browser";
 import Header from '@/app/Components/header';
+import Footer from '@/app/Components/footer';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -169,15 +170,15 @@ const Contact = () => {
                     <div className="space-y-4">
                         <div>
                             <h3 className="text-xl font-semibold text-[#4A8C8C]">Address</h3>
-                            <p className="text-gray-600">123 Hamra Street, Beirut, Lebanon</p>
+                            <p className="text-gray-600">123 Konnabeh, Baabdath, Lebanon</p>
                         </div>
                         <div>
                             <h3 className="text-xl font-semibold text-[#4A8C8C]">Email</h3>
-                            <p className="text-gray-600">info@mishatote.com</p>
+                            <p className="text-gray-600">michella.reaidy@gmail.com</p>
                         </div>
                         <div>
                             <h3 className="text-xl font-semibold text-[#4A8C8C]">Phone</h3>
-                            <p className="text-gray-600">+961 1 234 567</p>
+                            <p className="text-gray-600">+961 3 734 990</p>
                         </div>
                     </div>
                 </div>
@@ -187,16 +188,17 @@ const Contact = () => {
                     <div className="space-y-4">
                         <div>
                             <h3 className="text-xl font-semibold">Weekdays</h3>
-                            <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+                            <p>Monday - Saturday: 9:00 AM - 9:00 PM</p>
                         </div>
                         <div>
                             <h3 className="text-xl font-semibold">Weekends</h3>
-                            <p>Saturday: 10:00 AM - 4:00 PM</p>
+                    
                             <p>Sunday: Closed</p>
                         </div>
                     </div>
                 </div>
             </div>
+            <Footer />  {/* Add Footer component */}
         </div>
     );
 };
