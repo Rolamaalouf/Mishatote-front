@@ -256,6 +256,7 @@ export function CartProvider({ children }) {
     cartItems,
     cartCount,
     loading,
+    fetchCartCount: fetchCart,
     fetchCart,
     addToCart,
     updateCartItem,
@@ -264,6 +265,7 @@ export function CartProvider({ children }) {
     checkout, // Now this will be defined
     isCartOpen,
     toggleCart,
+    setCartCount, 
   }
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

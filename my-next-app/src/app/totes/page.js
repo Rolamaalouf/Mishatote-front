@@ -8,8 +8,10 @@ import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useCart } from "@/context/CartContext";
 
 export default function Products() {
+  const { fetchCartCount } = useCart(); 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -97,22 +99,44 @@ export default function Products() {
   // Handle add to cart
   const handleAddToCart = async () => {
     if (!selectedProduct) return;
-
+  
+    const availableStock = selectedProduct.stock ?? 0;
+  
+    if (quantity < 1) {
+      toast.error("Quantity must be at least 1.");
+      return;
+    }
+  
+    if (quantity > availableStock) {
+      toast.error(`Only ${availableStock} item(s) available in stock.`);
+      return;
+    }
+  
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/cart/add`,
         { product_id: selectedProduct.id, quantity },
         { withCredentials: true }
       );
-
+      
+      await fetchCartCount();
       toast.success(`Added ${quantity} item(s) to cart!`);
-      // Keep the modal open if needed or close it after adding to cart
       setShowCartModal(false);
     } catch (error) {
       console.error("Add to Cart Error:", error);
-      toast.error("Failed to add item to cart!");
+  
+      // Optional: log exact backend response
+      console.log("Backend said:", error.response?.data);
+  
+      if (error.response?.status === 400) {
+        const msg = error.response?.data?.message || "Stock error. Please reduce quantity.";
+        toast.error(msg);
+      } else {
+        toast.error("Something went wrong. Try again.");
+      }
     }
   };
+  
 
   // Sort products by price
   const sortedProducts = [...products].sort((a, b) =>

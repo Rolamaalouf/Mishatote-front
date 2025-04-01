@@ -5,12 +5,15 @@ import axios from "axios"
 import Link from "next/link"
 import { Minus, Plus, X, ShoppingBag, Trash2 } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
+import { useCart } from "@/context/CartContext"
+
 
 export default function CartPopup({ isOpen, onClose }) {
   const { user } = useAuth()
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const { cartCount, setCartCount } = useCart();
 
   // Fetch cart items with product details
   useEffect(() => {
@@ -42,6 +45,7 @@ export default function CartPopup({ isOpen, onClose }) {
                 ...item,
                 Product: productResponse.data,
                 subtotal: productResponse.data.price * item.quantity,
+                
               }
             } catch (err) {
               console.error(`Error fetching product ${item.product_id}:`, err)
@@ -54,7 +58,7 @@ export default function CartPopup({ isOpen, onClose }) {
           }),
         )
 
-        setCartItems(cartItemsWithProducts || [])
+        setCartItems(cartItemsWithProducts || []);
       } catch (err) {
         console.error("Error fetching cart:", err)
         setError("Failed to load cart items.")
@@ -65,31 +69,45 @@ export default function CartPopup({ isOpen, onClose }) {
 
     fetchCart()
   }, [isOpen, user])
+  useEffect(() => {
+    if (!isOpen) return;
+    const total = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    setCartCount(total);  
+  }, [cartItems, isOpen]);
+  
 
   // Update quantity
   const updateQuantity = async (productId, newQuantity) => {
-    if (newQuantity < 1) return
-
+    if (newQuantity < 1) return;
+  
+    const item = cartItems.find((item) => item.product_id === productId);
+    const stock = item?.Product?.stock ?? 0;
+  
+    if (newQuantity > stock) {
+      toast.error(`Only ${stock} item(s) available in stock.`);
+      return;
+    }
+  
     try {
-      // Update locally first for better UX
-      setCartItems((prevItems) =>
-        prevItems.map((item) => (item.product_id === productId ? { ...item, quantity: newQuantity } : item)),
-      )
-
-      // Then update on server
+      const updated = cartItems.map((item) =>
+        item.product_id === productId ? { ...item, quantity: newQuantity } : item
+      );
+  
+      setCartItems(updated);
+      setCartCount(updated.reduce((sum, i) => sum + i.quantity, 0)); // ✅ update cart count
+  
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
-        {
-          quantity: newQuantity,
-        },
-        {
-          withCredentials: true,
-        },
-      )
+        { quantity: newQuantity },
+        { withCredentials: true }
+      );
     } catch (err) {
-      console.error("Error updating quantity:", err)
+      console.error("Error updating quantity:", err);
+      toast.error("Something went wrong. Please try again.");
     }
-  }
+  };
+  
+  
 
   // Remove from cart
   const removeFromCart = async (productId) => {
@@ -99,7 +117,12 @@ export default function CartPopup({ isOpen, onClose }) {
       })
 
       // Update local state
-      setCartItems((prevItems) => prevItems.filter((item) => item.product_id !== productId))
+      setCartItems((prevItems) => {
+        const updated = prevItems.filter((item) => item.product_id !== productId);
+        setCartCount(updated.reduce((sum, i) => sum + i.quantity, 0)); // ✅ update cart count
+        return updated;
+      });
+      
     } catch (err) {
       console.error("Error removing item:", err)
     }
@@ -120,6 +143,8 @@ export default function CartPopup({ isOpen, onClose }) {
 
       // Update local state
       setCartItems([])
+      setCartCount(0); 
+
     } catch (err) {
       console.error("Error clearing cart:", err)
     }
@@ -198,8 +223,8 @@ export default function CartPopup({ isOpen, onClose }) {
                   <div className="flow-root">
                     <ul className="-my-6 divide-y divide-gray-200">
                       {cartItems.map((item) => (
-                        <li key={item.product_id} className="py-6 flex">
-                          {/* Product Image */}
+                        <li key={`${item.product_id}-${item.id || item.quantity}`} className="py-6 flex">
+                        {/* Product Image */}
                           {item.Product?.image && (
                             <div className="flex-shrink-0 w-20 h-20 rounded-md overflow-hidden">
                               <img

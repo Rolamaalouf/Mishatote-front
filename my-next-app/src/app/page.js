@@ -10,8 +10,12 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FiShoppingBag } from "react-icons/fi";
+import { useCart } from "@/context/CartContext";  
+
 
 export default function Home() {
+  
+const { setCartCount } = useCart(); 
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -72,21 +76,42 @@ export default function Home() {
 
   const handleAddToCart = async () => {
     if (!selectedProduct) return;
-
+  
+    const stock = selectedProduct.stock ?? 0;
+  
+    if (quantity < 1) {
+      toast.error("Quantity must be at least 1.");
+      return;
+    }
+  
+    if (quantity > stock) {
+      toast.error(`Only ${stock} item(s) available in stock.`);
+      return;
+    }
+  
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/cart/add`,
         { product_id: selectedProduct.id, quantity },
         { withCredentials: true }
       );
-
+   
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+        withCredentials: true,
+      });
+      const count = res.data.reduce((sum, item) => sum + item.quantity, 0);
+      setCartCount(count);
+  
       toast.success(`Added ${quantity} item(s) to cart!`);
       setShowCartModal(false);
     } catch (error) {
       console.error("Add to Cart Error:", error);
-      toast.error("Failed to add item to cart!");
+      const message = error.response?.data?.message || "Something went wrong. Please try again.";
+      toast.error(message);
     }
   };
+  
+  
 
   const latestProducts = [...products].slice(-4).reverse();
 

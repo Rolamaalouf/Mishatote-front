@@ -5,148 +5,134 @@ import axios from "axios"
 import Link from "next/link"
 import { Minus, Plus, X, ArrowLeft, Trash2 } from "lucide-react"
 import Header from "@/app/Components/header"
-import ContinueShopping from "@/app/Components/ContinueShopping";
-import { useAuth } from "@/context/AuthContext" // Import auth context
+import ContinueShopping from "@/app/Components/ContinueShopping"
+import { useAuth } from "@/context/AuthContext"
+import { useCart } from "@/context/CartContext" 
 
 export default function CartPage() {
-  const { user } = useAuth() // Get user from context
+  const { user } = useAuth()
+  const { setCartCount } = useCart() 
+
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
-// Fetch cart items with product details
-useEffect(() => {
-  const fetchCart = async () => {
-     // Ensure user exists before fetching
+  const updateCartCount = (items) => {
+    const total = items.reduce((sum, i) => sum + i.quantity, 0)
+    setCartCount(total)
+  }
+
+  useEffect(() => {
+    const fetchCart = async () => {
       if (!user) {
         setLoading(false)
         return
       }
-    try {
-      setLoading(true)
-      console.log("Fetching cart from:", `${process.env.NEXT_PUBLIC_API_URL}/cart`)
+      try {
+        setLoading(true)
 
-      // First, get the basic cart items
-      const cartResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
-        withCredentials: true,
-      })
+        const cartResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+          withCredentials: true,
+        })
 
-      // Then, for each cart item, get the product details
-      const cartItemsWithProducts = await Promise.all(
-        cartResponse.data.map(async (item) => {
-          try {
-            const productResponse = await axios.get(
-              `${process.env.NEXT_PUBLIC_API_URL}/products/${item.product_id}`,
-              { withCredentials: true },
-            )
-            return {
-              ...item,
-              Product: productResponse.data,
-              subtotal: productResponse.data.price * item.quantity,
+        const cartItemsWithProducts = await Promise.all(
+          cartResponse.data.map(async (item) => {
+            try {
+              const productResponse = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/products/${item.product_id}`,
+                { withCredentials: true }
+              )
+              return {
+                ...item,
+                Product: productResponse.data,
+                subtotal: productResponse.data.price * item.quantity,
+              }
+            } catch (err) {
+              console.error(`Error fetching product ${item.product_id}:`, err)
+              return {
+                ...item,
+                Product: null,
+                subtotal: 0,
+              }
             }
-          } catch (err) {
-            console.error(`Error fetching product ${item.product_id}:`, err)
-            return {
-              ...item,
-              Product: null,
-              subtotal: 0,
-            }
-          }
-        }),
-      )
+          })
+        )
 
-      console.log("Cart items with products:", cartItemsWithProducts)
-      setCartItems(cartItemsWithProducts || [])
-    } catch (err) {
-      console.error("Error fetching cart:", err)
-      setError("Failed to load cart items. Please try again later.")
-    } finally {
-      setLoading(false)
+        setCartItems(cartItemsWithProducts || [])
+        updateCartCount(cartItemsWithProducts || []) 
+      } catch (err) {
+        console.error("Error fetching cart:", err)
+        setError("Failed to load cart items. Please try again later.")
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
-  fetchCart()
-}, [user])// Refetch when user changes
+    fetchCart()
+  }, [user])
 
-  // Update quantity
+  //  UPDATE QUANTITY
   const updateQuantity = async (productId, newQuantity) => {
     if (newQuantity < 1) return
 
-    try {
-      // Update locally first for better UX
-      setCartItems((prevItems) =>
-        prevItems.map((item) => (item.product_id === productId ? { ...item, quantity: newQuantity } : item)),
-      )
+    const item = cartItems.find((item) => item.product_id === productId)
+    const stock = item?.Product?.stock ?? 0
 
-    // Then update on server
-    await axios.put(
-      `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
-      {
-        quantity: newQuantity,
-      },
-      {
-        withCredentials: true,
-      },
-    )
-  } catch (err) {
-    console.error("Error updating quantity:", err)
-    // Revert on failure by refetching
+    if (newQuantity > stock) {
+      alert(`Only ${stock} item(s) available in stock.`)
+      return
+    }
+
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart/with-products`, {
-        withCredentials: true,
-      })
-      setCartItems(response.data.items || [])
-    } catch (fetchErr) {
-      console.error("Error refetching cart:", fetchErr)
+      const updated = cartItems.map((item) =>
+        item.product_id === productId ? { ...item, quantity: newQuantity } : item
+      )
+      setCartItems(updated)
+      updateCartCount(updated) 
+
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
+        { quantity: newQuantity },
+        { withCredentials: true }
+      )
+    } catch (err) {
+      console.error("Error updating quantity:", err)
     }
   }
-}
 
-  // Remove from cart
+  // REMOVE
   const removeFromCart = async (productId) => {
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`, {
-        withCredentials: true, // Enable credentials
+        withCredentials: true,
       })
 
-      // Update local state
-      setCartItems((prevItems) => prevItems.filter((item) => item.product_id !== productId))
+      const updated = cartItems.filter((item) => item.product_id !== productId)
+      setCartItems(updated)
+      updateCartCount(updated) 
     } catch (err) {
       console.error("Error removing item:", err)
     }
   }
 
-  // Calculate totals dynamically (based on the prices of products)
-  const subtotal = cartItems.reduce((sum, item) => {
-    const price = item.Product?.price || 0;
-    return sum + (price * item.quantity);
-  }, 0);
-
-   // Format price to 2 decimal places
-   const formatPrice = (price) => {
-    return (Math.round(price * 100) / 100).toFixed(2)
+  // CLEAR
+  const clearCart = async () => {
+    try {
+      const deletePromises = cartItems.map((item) =>
+        axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${item.product_id}`, {
+          withCredentials: true,
+        })
+      )
+      await Promise.all(deletePromises)
+      setCartItems([])
+      setCartCount(0) // 
+    } catch (err) {
+      console.error("Error clearing cart:", err)
+    }
   }
 
-// Clear entire cart
-const clearCart = async () => {
-  try {
-    // Since there's no endpoint to clear the entire cart,
-    // we'll delete items one by one
-    const deletePromises = cartItems.map(item => 
-      axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${item.product_id}`, {
-        withCredentials: true,
-      })
-    );
-    
-    // Wait for all delete operations to complete
-    await Promise.all(deletePromises);
-    
-    // Update local state
-    setCartItems([]);
-  } catch (err) {
-    console.error("Error clearing cart:", err);
-  }
-}
+  //  ALL REMAINING CODE (HTML + JSX) CAN STAY THE SAME
+
 // More efficient approach using your existing endpoint
 /*const clearCart = async () => {
   try {
@@ -163,9 +149,12 @@ const clearCart = async () => {
 
   
   const displayItems = cartItems;
-  const displaySubtotal = subtotal;
-  const displayTotal = displaySubtotal;// No delivery fee added here as per the previous change
-
+  const displaySubtotal = cartItems.reduce((sum, item) => {
+    const price = item.Product?.price || 0;
+    return sum + price * item.quantity;
+  }, 0);
+  const displayTotal = displaySubtotal;
+ 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header Component */}
